@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.enonic.defaults' version '2.0.1'
+    id 'com.enonic.xp.base' version '2.0.0'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    xp.enonicRepo()
+}
+
+configurations {
+    includeProperties { transitive = false }
+}
+
+dependencies {
+    compile "com.enonic.xp:core-api:${xpVersion}"
+    compile "com.enonic.xp:script-api:${xpVersion}"
+    compile "com.enonic.xp:portal-api:${xpVersion}"
+    
+    compile "com.cronutils:cron-utils:8.0.0"
+
+    testCompile "com.enonic.xp:testing:${xpVersion}"
+    testCompile 'org.mockito:mockito-core:+'
+    testCompile 'junit:junit:4.12'
+    includeProperties "com.cronutils:cron-utils:8.0.0"
+}
+
+task copyPropertyFiles(type: Copy) {
+    def libFile = file(configurations.includeProperties.singleFile)
+    def libFiles = zipTree(libFile)
+
+    from libFiles
+    into "${buildDir}/resources/main/properties"
+    include "CronUtilsI18N_*.properties"
+}
+
+jar {
+    from 'CronUtilsI18N_*.properties'
+}
+
+jar.dependsOn copyPropertyFiles
