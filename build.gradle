@@ -2,13 +2,14 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'com.enonic.defaults' version '2.0.1'
-    id 'com.enonic.xp.base' version '2.0.0'
 }
 
 repositories {
     mavenLocal()
     jcenter()
-    xp.enonicRepo()
+    maven {
+        url 'http://repo.enonic.com/public'
+    }
 }
 
 configurations {
@@ -20,12 +21,12 @@ dependencies {
     compile "com.enonic.xp:script-api:${xpVersion}"
     compile "com.enonic.xp:portal-api:${xpVersion}"
     
-    compile "com.cronutils:cron-utils:8.0.0"
+    include "com.cronutils:cron-utils:8.0.0"
+    includeProperties "com.cronutils:cron-utils:8.0.0"
 
     testCompile "com.enonic.xp:testing:${xpVersion}"
     testCompile 'org.mockito:mockito-core:+'
     testCompile 'junit:junit:4.12'
-    includeProperties "com.cronutils:cron-utils:8.0.0"
 }
 
 task copyPropertyFiles(type: Copy) {

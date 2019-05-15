@@ -5,5 +5,5 @@ exports.schedule = function (name, cron, callback) {
 };
 
 exports.unschedule = function (name) {
-
+    return service.unschedule(name);
 };
