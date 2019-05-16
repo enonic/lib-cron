@@ -15,12 +15,12 @@ public final class JobDescriptorFactoryImpl
     private final static Logger LOG = LoggerFactory.getLogger( JobDescriptorFactoryImpl.class );
 
     @Override
-    public JobDescriptor create( final String name, final String cron, final ScriptObjectMirror script )
+    public JobDescriptor create( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
     {
-        return parseJob( name, cron, script);
+        return parseJob( name, cron, applicationKey, script);
     }
 
-    private JobDescriptor parseJob( final String name, final String cron, final ScriptObjectMirror script )
+    private JobDescriptor parseJob( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
     {
         if ( Strings.isNullOrEmpty( name ) )
         {
@@ -44,6 +44,7 @@ public final class JobDescriptorFactoryImpl
             name( name ).
             cron( cron ).
             script(script).
+            applicationKey( applicationKey ).
             build();
     }
 }
