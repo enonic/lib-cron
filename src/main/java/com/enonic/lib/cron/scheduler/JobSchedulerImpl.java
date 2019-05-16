@@ -69,13 +69,24 @@ public final class JobSchedulerImpl
     @Override
     public void schedule( final JobDescriptor job )
     {
+        doSchedule( job );
+        LOG.info( "Added job " + job.getDescription() );
+    }
+
+    @Override
+    public void reschedule( final JobDescriptor job )
+    {
+        doSchedule( job );
+    }
+
+    private void doSchedule( final JobDescriptor job )
+    {
         final long delay = job.nextExecution().toMillis();
         final JobExecutionTask task = new JobExecutionTask( job, this, this.runner );
 
         this.tasks.put( job, task );
         this.timer.schedule( task, delay );
 
-        LOG.info( "Added job " + job.getDescription() );
     }
 
     @Reference

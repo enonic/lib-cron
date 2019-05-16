@@ -25,6 +25,6 @@ final class JobExecutionTask
     public void run()
     {
         this.runner.run( this.descriptor );
-        this.scheduler.schedule( this.descriptor );
+        this.scheduler.reschedule( this.descriptor );
     }
 }
