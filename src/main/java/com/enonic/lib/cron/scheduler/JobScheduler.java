@@ -9,5 +9,7 @@ public interface JobScheduler
 
     void schedule( JobDescriptors jobs );
 
+    void reschedule( JobDescriptor job );
+
     void unschedule( String name );
 }
