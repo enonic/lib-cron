@@ -12,33 +12,51 @@ repositories {
 }
 
 configurations {
-    includeProperties { transitive = false }
+    includeLib { transitive = false }
 }
 
 dependencies {
     compile "com.enonic.xp:core-api:${xpVersion}"
     compile "com.enonic.xp:script-api:${xpVersion}"
     compile "com.enonic.xp:portal-api:${xpVersion}"
-    
+
     compile "com.cronutils:cron-utils:8.0.0"
+    includeLib "com.cronutils:cron-utils:8.0.0"
 
     testCompile "com.enonic.xp:testing:${xpVersion}"
     testCompile 'org.mockito:mockito-core:+'
     testCompile 'junit:junit:4.12'
-    includeProperties "com.cronutils:cron-utils:8.0.0"
 }
 
 task copyPropertyFiles(type: Copy) {
-    def libFile = file(configurations.includeProperties.singleFile)
+    def libFile = file(configurations.includeLib.singleFile)
     def libFiles = zipTree(libFile)
 
-    from libFiles
-    into "${buildDir}/resources/main/properties"
-    include "CronUtilsI18N_*.properties"
+    def propertySpec = copySpec {
+        from libFiles
+        include "CronUtilsI18N*.properties"
+
+    }
+
+    into "${buildDir}/resources/main/properties" with propertySpec
+
+}
+
+task copyClassFiles(type: Copy) {
+    def libFile = file(configurations.includeLib.singleFile)
+    def libFiles = zipTree(libFile)
+
+    def classSpec = copySpec {
+        from libFiles
+        include "**/*.class"
+    }
+
+    into "${buildDir}/classes/java/main" with classSpec
 }
 
 jar {
     from 'CronUtilsI18N_*.properties'
+    from '*.class'
 }
 
-jar.dependsOn copyPropertyFiles
+jar.dependsOn copyPropertyFiles, copyClassFiles
