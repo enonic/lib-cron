@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
+import com.enonic.xp.app.ApplicationKey;
 
 @Component(immediate = true)
 public final class JobSchedulerImpl
@@ -56,10 +57,19 @@ public final class JobSchedulerImpl
         this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getName().equals( jobName ) ).
-            findFirst().ifPresent(this::unschedule);
+            findFirst().ifPresent(this::doUnschedule );
     }
 
-    private void unschedule(final JobDescriptor job) {
+    @Override
+    public void unscheduleByKey( final ApplicationKey key )
+    {
+        this.tasks.keySet().
+            stream().
+            filter( jobDescriptor -> jobDescriptor.getApplicationKey().equals( key ) ).
+            findFirst().ifPresent(this::doUnschedule);
+    }
+
+    private void doUnschedule( final JobDescriptor job) {
         final TimerTask task = this.tasks.remove( job );
         task.cancel();
 

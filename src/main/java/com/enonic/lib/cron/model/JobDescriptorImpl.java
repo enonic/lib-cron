@@ -20,11 +20,14 @@ final class JobDescriptorImpl
 
     private final ScriptObjectMirror script;
 
+    private final ApplicationKey applicationKey;
+
     private JobDescriptorImpl( final Builder builder )
     {
         this.name = builder.name;
         this.trigger = CronTrigger.from( builder.cron );
         this.script = builder.script;
+        this.applicationKey = builder.applicationKey;
     }
 
     @Override
@@ -43,6 +46,12 @@ final class JobDescriptorImpl
     public ScriptObjectMirror getScript()
     {
         return this.script;
+    }
+
+    @Override
+    public ApplicationKey getApplicationKey()
+    {
+        return applicationKey;
     }
 
     @Override
@@ -82,6 +91,8 @@ final class JobDescriptorImpl
 
     static final class Builder
     {
+        private ApplicationKey applicationKey;
+
         private String name;
 
         private String cron;
@@ -103,6 +114,12 @@ final class JobDescriptorImpl
         Builder script( final ScriptObjectMirror script )
         {
             this.script = script;
+            return this;
+        }
+
+        public Builder applicationKey( final String applicationKey )
+        {
+            this.applicationKey = ApplicationKey.from( applicationKey );
             return this;
         }
 

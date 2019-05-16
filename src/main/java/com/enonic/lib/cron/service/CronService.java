@@ -15,9 +15,9 @@ public final class CronService
 
     private JobScheduler jobScheduler;
 
-    public void schedule( final String name, final String cron, final ScriptObjectMirror script )
+    public void schedule( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
     {
-        final JobDescriptor jobDescriptor = JobDescriptorFactory.create( name, cron, script );
+        final JobDescriptor jobDescriptor = JobDescriptorFactory.create( name, cron, applicationKey, script );
 
         if ( jobDescriptor == null )
         {
