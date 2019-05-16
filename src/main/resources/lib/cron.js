@@ -1,9 +1,9 @@
 var service = __.newBean('com.enonic.lib.cron.service.CronService');
 
-exports.schedule = function (name, cron, callback) {
-    return service.schedule(name, cron, app.name, callback);
+exports.schedule = function (params) {
+    return service.schedule(params.name, params.cron, app.name, params.callback);
 };
 
-exports.unschedule = function (name) {
-    return service.unschedule(name);
+exports.unschedule = function (params) {
+    return service.unschedule(params.name);
 };
