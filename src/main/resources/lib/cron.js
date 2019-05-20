@@ -7,3 +7,8 @@ exports.schedule = function (params) {
 exports.unschedule = function (params) {
     return service.unschedule(params.name);
 };
+
+exports.reschedule = function (params) {
+    exports.unschedule(params);
+    return exports.schedule(params);
+};
