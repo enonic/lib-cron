@@ -1,14 +1,18 @@
 var service = __.newBean('com.enonic.lib.cron.service.CronService');
 
-exports.schedule = function (params) {
+function schedule(params) {
     return service.schedule(params.name, params.cron, app.name, params.callback);
-};
+}
 
-exports.unschedule = function (params) {
+function unschedule(params) {
     return service.unschedule(params.name);
-};
+}
 
-exports.reschedule = function (params) {
-    exports.unschedule(params);
-    return exports.schedule(params);
-};
+function reschedule(params) {
+    unschedule(params);
+    return schedule(params);
+}
+
+exports.reschedule = reschedule;
+exports.schedule = schedule;
+exports.unschedule = unschedule;
