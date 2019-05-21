@@ -2,13 +2,14 @@ package com.enonic.lib.cron.model;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.Callable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.enonic.xp.app.ApplicationKey;
+import com.enonic.xp.context.Context;
 import com.enonic.xp.resource.ResourceKey;
 
 final class JobDescriptorImpl
@@ -16,18 +17,28 @@ final class JobDescriptorImpl
 {
     private final String name;
 
-    private final CronTrigger trigger;
+    private  CronTrigger trigger;
 
-    private final ScriptObjectMirror script;
+    private final Callable<Object> script;
 
     private final ApplicationKey applicationKey;
+
+    private final Context context;
 
     private JobDescriptorImpl( final Builder builder )
     {
         this.name = builder.name;
-        this.trigger = CronTrigger.from( builder.cron );
+        try
+        {
+            this.trigger = CronTrigger.from( builder.cron );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
         this.script = builder.script;
         this.applicationKey = builder.applicationKey;
+        this.context = builder.context;
     }
 
     @Override
@@ -43,7 +54,7 @@ final class JobDescriptorImpl
     }
 
     @Override
-    public ScriptObjectMirror getScript()
+    public Callable<Object> getScript()
     {
         return this.script;
     }
@@ -52,6 +63,11 @@ final class JobDescriptorImpl
     public ApplicationKey getApplicationKey()
     {
         return applicationKey;
+    }
+
+    public Context getContext()
+    {
+        return context;
     }
 
     @Override
@@ -97,7 +113,9 @@ final class JobDescriptorImpl
 
         private String cron;
 
-        private ScriptObjectMirror script;
+        private Callable<Object> script;
+
+        private Context context;
 
         Builder name( final String name )
         {
@@ -111,7 +129,7 @@ final class JobDescriptorImpl
             return this;
         }
 
-        Builder script( final ScriptObjectMirror script )
+        Builder script( final Callable<Object> script )
         {
             this.script = script;
             return this;
@@ -120,6 +138,12 @@ final class JobDescriptorImpl
         public Builder applicationKey( final String applicationKey )
         {
             this.applicationKey = ApplicationKey.from( applicationKey );
+            return this;
+        }
+
+        public Builder context( final Context context )
+        {
+            this.context = context;
             return this;
         }
 

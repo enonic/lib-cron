@@ -73,14 +73,13 @@ public final class JobSchedulerImpl
         final TimerTask task = this.tasks.remove( job );
         task.cancel();
 
-        LOG.info( "Removed job " + job.getDescription() );
     }
 
     @Override
     public void schedule( final JobDescriptor job )
     {
         doSchedule( job );
-        LOG.info( "Added job " + job.getDescription() );
+        LOG.info( "Added job: " + job.getDescription() );
     }
 
     @Override

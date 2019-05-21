@@ -1,12 +1,16 @@
 package com.enonic.lib.cron.model;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import com.enonic.lib.cron.context.ContextFactory;
+import com.enonic.lib.cron.service.ScheduleParams;
+import com.enonic.xp.context.Context;
+
 
 @Component(immediate = true)
 public final class JobDescriptorFactoryImpl
@@ -14,37 +18,48 @@ public final class JobDescriptorFactoryImpl
 {
     private final static Logger LOG = LoggerFactory.getLogger( JobDescriptorFactoryImpl.class );
 
+    private ContextFactory contextFactory;
+
     @Override
-    public JobDescriptor create( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
+    public JobDescriptor create( final ScheduleParams params, final Context defaultContext )
     {
-        return parseJob( name, cron, applicationKey, script);
+        JobDescriptorImpl.Builder builder = parseJob( params );
+
+        final Context context = contextFactory.create( params.getContext(), defaultContext );
+
+        return builder.context( context ).build();
     }
 
-    private JobDescriptor parseJob( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
+    private JobDescriptorImpl.Builder parseJob( final ScheduleParams params )
     {
-        if ( Strings.isNullOrEmpty( name ) )
+        if ( Strings.isNullOrEmpty( params.getName() ) )
         {
-            LOG.error( "Failed to create job descriptor, name is empty");
+            LOG.error( "Failed to create job descriptor, name is empty" );
             return null;
         }
 
-        if ( Strings.isNullOrEmpty( cron ) )
+        if ( Strings.isNullOrEmpty( params.getCron() ) )
         {
-            LOG.error( "Failed to create job descriptor, cron string is empty");
+            LOG.error( "Failed to create job descriptor, cron string is empty" );
             return null;
         }
 
-        if ( script == null )
+        if ( params.getScript() == null )
         {
-            LOG.error( "Failed to create job descriptor, callback script is empty");
+            LOG.error( "Failed to create job descriptor, callback script is empty" );
             return null;
         }
 
         return JobDescriptorImpl.builder().
-            name( name ).
-            cron( cron ).
-            script(script).
-            applicationKey( applicationKey ).
-            build();
+            name( params.getName() ).
+            cron( params.getCron() ).
+            script( params.getScript() ).
+            applicationKey( params.getApplicationKey() );
+    }
+
+    @Reference
+    public void setContextFactory( final ContextFactory contextFactory )
+    {
+        this.contextFactory = contextFactory;
     }
 }
