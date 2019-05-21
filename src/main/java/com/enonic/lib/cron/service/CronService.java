@@ -1,10 +1,11 @@
 package com.enonic.lib.cron.service;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import java.util.function.Supplier;
 
 import com.enonic.lib.cron.model.JobDescriptorFactory;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.scheduler.JobScheduler;
+import com.enonic.xp.context.Context;
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
 
@@ -15,13 +16,15 @@ public final class CronService
 
     private JobScheduler jobScheduler;
 
-    public void schedule( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script )
+    private Supplier<Context> context;
+
+    public void schedule( final ScheduleParams params )
     {
-        final JobDescriptor jobDescriptor = JobDescriptorFactory.create( name, cron, applicationKey, script );
+        final JobDescriptor jobDescriptor = JobDescriptorFactory.create( params, context.get() );
 
         if ( jobDescriptor == null )
         {
-            throw new RuntimeException( String.format( "Cannot create a job 'name: %s, cron:%s'", name, cron ) );
+            throw new RuntimeException( String.format( "Cannot create a job 'name: %s, cron:%s'", params.name, params.cron ) );
         }
 
         this.jobScheduler.schedule( jobDescriptor );
@@ -33,10 +36,16 @@ public final class CronService
         this.jobScheduler.unschedule( jobName );
     }
 
+    public ScheduleParams newParams()
+    {
+        return new ScheduleParams();
+    }
+
     @Override
     public void initialize( final BeanContext context )
     {
         this.JobDescriptorFactory = context.getService( JobDescriptorFactory.class ).get();
         this.jobScheduler = context.getService( JobScheduler.class ).get();
+        this.context = context.getBinding( Context.class );
     }
 }

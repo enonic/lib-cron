@@ -1,8 +1,10 @@
 package com.enonic.lib.cron.model;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import com.enonic.lib.cron.service.ScheduleParams;
+import com.enonic.xp.context.Context;
+
 
 public interface JobDescriptorFactory
 {
-    JobDescriptor create( final String name, final String cron, final String applicationKey, final ScriptObjectMirror script);
+    JobDescriptor create( final ScheduleParams params, final Context context);
 }

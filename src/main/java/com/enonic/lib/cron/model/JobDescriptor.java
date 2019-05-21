@@ -1,21 +1,23 @@
 package com.enonic.lib.cron.model;
 
 import java.time.Duration;
+import java.util.concurrent.Callable;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.enonic.xp.app.ApplicationKey;
-import com.enonic.xp.resource.ResourceKey;
+import com.enonic.xp.context.Context;
 
 public interface JobDescriptor
 {
     String getName();
 
-    ScriptObjectMirror getScript();
+   Callable<Object> getScript();
 
     ApplicationKey getApplicationKey();
 
     String getDescription();
+
+    Context getContext();
 
     Duration nextExecution();
 }
