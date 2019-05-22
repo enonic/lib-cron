@@ -36,6 +36,11 @@ public final class CronService
         this.jobScheduler.unschedule( jobName );
     }
 
+    public JobDescriptorMapper get( final String jobName )
+    {
+        return this.jobScheduler.get( jobName );
+    }
+
     public ScheduleParams newParams()
     {
         return new ScheduleParams();

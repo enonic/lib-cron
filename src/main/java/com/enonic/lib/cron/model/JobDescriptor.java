@@ -11,6 +11,8 @@ public interface JobDescriptor
 {
     String getName();
 
+    String getCron();
+
    Callable<Object> getScript();
 
     ApplicationKey getApplicationKey();

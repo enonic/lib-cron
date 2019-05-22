@@ -52,6 +52,12 @@ function reschedule(params) {
     return schedule(params);
 }
 
+function get(params) {
+    var result =  service.get(params.name);
+    return __.toNativeObject(result);
+}
+
 exports.reschedule = reschedule;
 exports.schedule = schedule;
 exports.unschedule = unschedule;
+exports.get = get;

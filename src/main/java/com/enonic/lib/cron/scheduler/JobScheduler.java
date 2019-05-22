@@ -2,6 +2,7 @@ package com.enonic.lib.cron.scheduler;
 
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
+import com.enonic.lib.cron.service.JobDescriptorMapper;
 import com.enonic.xp.app.ApplicationKey;
 
 public interface JobScheduler
@@ -15,4 +16,6 @@ public interface JobScheduler
     void unschedule( String name );
 
     void unscheduleByKey( ApplicationKey key );
+
+    JobDescriptorMapper get( String name );
 }

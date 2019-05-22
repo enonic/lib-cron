@@ -48,6 +48,12 @@ final class JobDescriptorImpl
     }
 
     @Override
+    public String getCron()
+    {
+        return trigger.toString();
+    }
+
+    @Override
     public Duration nextExecution()
     {
         return this.trigger.nextExecution();
