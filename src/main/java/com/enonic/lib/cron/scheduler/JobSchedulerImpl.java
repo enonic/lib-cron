@@ -1,6 +1,7 @@
 package com.enonic.lib.cron.scheduler;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,6 +16,7 @@ import com.google.common.collect.Maps;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
+import com.enonic.lib.cron.service.JobDescriptorMapper;
 import com.enonic.xp.app.ApplicationKey;
 
 @Component(immediate = true)
@@ -57,7 +59,7 @@ public final class JobSchedulerImpl
         this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getName().equals( jobName ) ).
-            findFirst().ifPresent(this::doUnschedule );
+            findFirst().ifPresent( this::doUnschedule );
     }
 
     @Override
@@ -66,14 +68,9 @@ public final class JobSchedulerImpl
         this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getApplicationKey().equals( key ) ).
-            findFirst().ifPresent(this::doUnschedule);
+            findFirst().ifPresent( this::doUnschedule );
     }
 
-    private void doUnschedule( final JobDescriptor job) {
-        final TimerTask task = this.tasks.remove( job );
-        task.cancel();
-
-    }
 
     @Override
     public void schedule( final JobDescriptor job )
@@ -88,6 +85,18 @@ public final class JobSchedulerImpl
         doSchedule( job );
     }
 
+    @Override
+    public JobDescriptorMapper get( final String jobName )
+    {
+        final Optional<JobDescriptor> jobDescriptor = this.tasks.keySet().
+            stream().
+            filter( desc -> desc.getName().equals( jobName ) ).
+            findFirst();
+
+        return jobDescriptor.isPresent() ? new JobDescriptorMapper( jobDescriptor.get() ) : null;
+
+    }
+
     private void doSchedule( final JobDescriptor job )
     {
         final long delay = job.nextExecution().toMillis();
@@ -96,6 +105,12 @@ public final class JobSchedulerImpl
         this.tasks.put( job, task );
         this.timer.schedule( task, delay );
 
+    }
+
+    private void doUnschedule( final JobDescriptor job )
+    {
+        final TimerTask task = this.tasks.remove( job );
+        task.cancel();
     }
 
     @Reference
