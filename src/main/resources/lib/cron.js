@@ -57,7 +57,22 @@ function get(params) {
     return __.toNativeObject(result);
 }
 
+function list(params) {
+    var listParams = service.listParams();
+
+    if(params) {
+        if (params.pattern) {
+            listParams.pattern = params.pattern;
+        }
+    }
+
+    var result = service.list(listParams);
+
+    return __.toNativeObject(result);
+}
+
 exports.reschedule = reschedule;
 exports.schedule = schedule;
 exports.unschedule = unschedule;
 exports.get = get;
+exports.list = list;
