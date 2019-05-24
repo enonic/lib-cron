@@ -1,15 +1,9 @@
-package com.enonic.lib.cron.service;
+package com.enonic.lib.cron.service.mapper;
 
 import com.enonic.lib.cron.model.JobDescriptor;
-import com.enonic.lib.cron.scheduler.JobScheduler;
 import com.enonic.xp.context.Context;
-import com.enonic.xp.lib.common.PrincipalMapper;
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
-import com.enonic.xp.security.PrincipalKey;
-import com.enonic.xp.security.PrincipalKeys;
-import com.enonic.xp.security.User;
-import com.enonic.xp.security.auth.AuthenticationInfo;
 
 public final class JobDescriptorMapper
     implements MapSerializable

@@ -1,6 +1,6 @@
 package com.enonic.lib.cron.context;
 
-import com.enonic.lib.cron.service.ContextParams;
+import com.enonic.lib.cron.service.params.ContextParams;
 import com.enonic.xp.context.Context;
 
 public interface ContextFactory

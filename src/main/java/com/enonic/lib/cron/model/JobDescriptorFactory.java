@@ -1,6 +1,6 @@
 package com.enonic.lib.cron.model;
 
-import com.enonic.lib.cron.service.ScheduleParams;
+import com.enonic.lib.cron.service.params.ScheduleParams;
 import com.enonic.xp.context.Context;
 
 

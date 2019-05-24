@@ -17,7 +17,7 @@ final class JobDescriptorImpl
 {
     private final String name;
 
-    private  CronTrigger trigger;
+    private CronTrigger trigger;
 
     private final Callable<Object> script;
 
@@ -101,14 +101,14 @@ final class JobDescriptorImpl
             return false;
         }
         final JobDescriptorImpl that = (JobDescriptorImpl) o;
-        return Objects.equals( name, that.name ) && Objects.equals( trigger, that.trigger ) &&
-            Objects.equals( script, that.script );
+        return Objects.equals( name, that.name ) && Objects.equals( trigger.toString(), that.trigger.toString() ) &&
+            Objects.equals( applicationKey, that.applicationKey );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( name, trigger, script );
+        return Objects.hash( name, trigger.toString(), applicationKey );
     }
 
     static final class Builder

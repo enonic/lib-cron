@@ -1,10 +1,13 @@
 package com.enonic.lib.cron.scheduler;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
@@ -16,7 +19,7 @@ import com.google.common.collect.Maps;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
-import com.enonic.lib.cron.service.JobDescriptorMapper;
+import com.enonic.lib.cron.service.mapper.JobDescriptorMapper;
 import com.enonic.xp.app.ApplicationKey;
 
 @Component(immediate = true)
@@ -85,15 +88,28 @@ public final class JobSchedulerImpl
     }
 
     @Override
-    public JobDescriptorMapper get( final String jobName )
+    public JobDescriptor get( final String jobName )
     {
         final Optional<JobDescriptor> jobDescriptor = this.tasks.keySet().
             stream().
             filter( desc -> desc.getName().equals( jobName ) ).
             findFirst();
 
-        return jobDescriptor.isPresent() ? new JobDescriptorMapper( jobDescriptor.get() ) : null;
+        return jobDescriptor.orElse( null );
 
+    }
+
+    @Override
+    public JobDescriptors list( final String jobNamePattern )
+    {
+        final JobDescriptors jobDescriptors = new JobDescriptors();
+
+        this.tasks.keySet().
+            stream().
+            filter( job -> StringUtils.isBlank( jobNamePattern ) || job.getName().matches( jobNamePattern ) ).
+            forEach( jobDescriptors::add );
+
+        return jobDescriptors;
     }
 
     private void doSchedule( final JobDescriptor job )
