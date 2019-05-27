@@ -19,6 +19,6 @@ public class JobExecutionTaskTest
         task.run();
 
         Mockito.verify( runner, Mockito.times( 1 ) ).run( job );
-        Mockito.verify( scheduler, Mockito.times( 1 ) ).reschedule( job );
+        Mockito.verify( scheduler, Mockito.times( 1 ) ).reschedule( task );
     }
 }

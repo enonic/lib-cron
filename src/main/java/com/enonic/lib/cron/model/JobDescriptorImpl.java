@@ -2,6 +2,7 @@ package com.enonic.lib.cron.model;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import com.google.common.base.Preconditions;
@@ -23,6 +24,8 @@ final class JobDescriptorImpl
 
     private final ApplicationKey applicationKey;
 
+    private final Optional<Integer> times;
+
     private final Context context;
 
     private JobDescriptorImpl( final Builder builder )
@@ -38,6 +41,7 @@ final class JobDescriptorImpl
         }
         this.script = builder.script;
         this.applicationKey = builder.applicationKey;
+        this.times = Optional.ofNullable( builder.times );
         this.context = builder.context;
     }
 
@@ -71,6 +75,11 @@ final class JobDescriptorImpl
         return applicationKey;
     }
 
+    public Optional<Integer> getTimes()
+    {
+        return times ;
+    }
+
     public Context getContext()
     {
         return context;
@@ -102,13 +111,13 @@ final class JobDescriptorImpl
         }
         final JobDescriptorImpl that = (JobDescriptorImpl) o;
         return Objects.equals( name, that.name ) && Objects.equals( trigger.toString(), that.trigger.toString() ) &&
-            Objects.equals( applicationKey, that.applicationKey );
+            Objects.equals( applicationKey, that.applicationKey ) && Objects.equals( times, that.times );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( name, trigger.toString(), applicationKey );
+        return Objects.hash( name, trigger.toString(), applicationKey, times );
     }
 
     static final class Builder
@@ -118,6 +127,8 @@ final class JobDescriptorImpl
         private String name;
 
         private String cron;
+
+        private Integer times;
 
         private Callable<Object> script;
 
@@ -144,6 +155,12 @@ final class JobDescriptorImpl
         public Builder applicationKey( final String applicationKey )
         {
             this.applicationKey = ApplicationKey.from( applicationKey );
+            return this;
+        }
+
+        public Builder times( final Integer times )
+        {
+            this.times = times;
             return this;
         }
 

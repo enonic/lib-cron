@@ -54,6 +54,7 @@ public final class JobDescriptorFactoryImpl
             name( params.getName() ).
             cron( params.getCron() ).
             script( params.getScript() ).
+            times(params.getTimes()).
             applicationKey( params.getApplicationKey() );
     }
 

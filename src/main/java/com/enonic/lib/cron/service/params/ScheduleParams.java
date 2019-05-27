@@ -10,6 +10,8 @@ public class ScheduleParams
 
     protected String applicationKey;
 
+    protected Integer times;
+
     protected Callable<Object> script;
 
     protected ContextParams context;
@@ -34,6 +36,12 @@ public class ScheduleParams
     public ScheduleParams setApplicationKey( final String applicationKey )
     {
         this.applicationKey = applicationKey;
+        return this;
+    }
+
+    public ScheduleParams setTimes( final Integer times )
+    {
+        this.times = times;
         return this;
     }
 
@@ -62,6 +70,11 @@ public class ScheduleParams
     public String getApplicationKey()
     {
         return applicationKey;
+    }
+
+    public Integer getTimes()
+    {
+        return times;
     }
 
     public Callable<Object> getScript()

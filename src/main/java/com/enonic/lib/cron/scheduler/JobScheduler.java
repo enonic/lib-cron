@@ -11,7 +11,7 @@ public interface JobScheduler
 
     void schedule( JobDescriptors jobs );
 
-    void reschedule( JobDescriptor job );
+    void reschedule( JobExecutionTask task );
 
     void unschedule( String name );
 

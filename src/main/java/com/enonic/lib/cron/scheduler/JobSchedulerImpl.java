@@ -83,9 +83,10 @@ public final class JobSchedulerImpl
     }
 
     @Override
-    public void reschedule( final JobDescriptor job )
+    public void reschedule( final JobExecutionTask task )
     {
-        doSchedule( job );
+        final long delay = task.getDescriptor().nextExecution().toMillis();
+        this.timer.schedule( new JobExecutionTask( task ), delay );
     }
 
     @Override
