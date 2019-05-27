@@ -8,6 +8,7 @@ function schedule(params) {
     serviceParams.name = params.name;
     serviceParams.cron = params.cron;
     serviceParams.script = params.callback;
+    serviceParams.times = params.times;
 
     serviceParams.applicationKey = app.name;
 

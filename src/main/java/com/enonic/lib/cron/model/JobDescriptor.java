@@ -1,6 +1,7 @@
 package com.enonic.lib.cron.model;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 
@@ -16,6 +17,8 @@ public interface JobDescriptor
    Callable<Object> getScript();
 
     ApplicationKey getApplicationKey();
+
+    Optional<Integer> getTimes();
 
     String getDescription();
 
