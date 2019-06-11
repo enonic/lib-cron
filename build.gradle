@@ -29,6 +29,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+wrapper {
+	distributionUrl = "${gradleDistributionUrl}"
+}
+
 task copyPropertyFiles(type: Copy) {
     def libFile = file(configurations.includeLib.singleFile)
     def libFiles = zipTree(libFile)
