@@ -2,6 +2,7 @@ package com.enonic.lib.cron.model;
 
 import java.util.concurrent.Callable;
 
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class JobDescriptorImplTest
         builder.name( "myJob" );
         builder.cron( "* * * * *" );
 
-        final NashornScriptEngine engine = (NashornScriptEngine) new ScriptEngineManager().getEngineByName( "nashorn");
+        final ScriptEngine engine = new ScriptEngineManager().getEngineByName( "nashorn");
         builder.script( () -> engine.eval( "(function() { try { require('./invalid'); } catch (ex) { return ex.code; } })" ) );
         builder.context( ContextAccessor.current() );
 
