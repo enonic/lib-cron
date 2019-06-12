@@ -47,7 +47,7 @@ final class JobExecutionTask
 
             if ( runCheckFunction.apply( this.descriptor ) )
             {
-                this.scheduler.reschedule( this );
+                this.scheduler.reschedule( this.descriptor );
             }
         }
     }

@@ -11,11 +11,11 @@ public interface JobScheduler
 
     void schedule( JobDescriptors jobs );
 
-    void reschedule( JobExecutionTask task );
+    void reschedule( JobDescriptor jobDescriptor);
 
-    void unschedule( String name );
+    boolean unschedule( String name );
 
-    void unscheduleByKey( ApplicationKey key );
+    boolean unscheduleByKey( ApplicationKey key );
 
     JobDescriptor get( String name );
 

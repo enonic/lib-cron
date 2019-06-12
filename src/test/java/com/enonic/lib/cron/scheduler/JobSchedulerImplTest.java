@@ -1,7 +1,9 @@
 package com.enonic.lib.cron.scheduler;
 
 import java.time.Duration;
+import java.util.Optional;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -50,6 +52,40 @@ public class JobSchedulerImplTest
         final JobDescriptors jobs = new JobDescriptors();
         this.scheduler.schedule( jobs );
         this.scheduler.unschedule( "not_scheduled" );
+        this.scheduler.deactivate();
+    }
+
+    @Test
+    public void testStop()
+        throws Exception
+    {
+        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job.nextExecution() ).thenReturn( Duration.ofMillis( 100000 ) );
+        Mockito.when( job.getName() ).thenReturn( "jobName" );
+        Mockito.when( job.getTimes() ).thenReturn( Optional.of( 5 ) );
+
+        this.scheduler.schedule( job );
+
+        Thread.sleep( 200 );
+
+        Assert.assertTrue( this.scheduler.unschedule( job.getName() ));
+        this.scheduler.deactivate();
+    }
+
+    @Test
+    public void testStopFailed()
+        throws Exception
+    {
+        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job.nextExecution() ).thenReturn( Duration.ofMillis( 100 ) );
+        Mockito.when( job.getName() ).thenReturn( "jobName" );
+        Mockito.when( job.getTimes() ).thenReturn( Optional.of( 5 ) );
+
+        this.scheduler.schedule( job );
+
+        Thread.sleep( 1000 );
+
+        Assert.assertFalse( this.scheduler.unschedule( job.getName() ));
         this.scheduler.deactivate();
     }
 }

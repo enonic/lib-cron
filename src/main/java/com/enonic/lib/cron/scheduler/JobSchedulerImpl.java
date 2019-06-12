@@ -1,11 +1,9 @@
 package com.enonic.lib.cron.scheduler;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
@@ -19,7 +17,6 @@ import com.google.common.collect.Maps;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
-import com.enonic.lib.cron.service.mapper.JobDescriptorMapper;
 import com.enonic.xp.app.ApplicationKey;
 
 @Component(immediate = true)
@@ -30,7 +27,7 @@ public final class JobSchedulerImpl
 
     private final Timer timer;
 
-    private final Map<JobDescriptor, TimerTask> tasks;
+    private final Map<JobDescriptor, JobExecutionTask> tasks;
 
     private JobRunner runner;
 
@@ -57,21 +54,26 @@ public final class JobSchedulerImpl
     }
 
     @Override
-    public void unschedule( final String jobName )
+    public boolean unschedule( final String jobName )
     {
-        this.tasks.keySet().
+        final Optional<JobDescriptor> job = this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getName().equals( jobName ) ).
-            findFirst().ifPresent( this::doUnschedule );
+            findFirst();
+
+        return job.filter( this::doUnschedule ).isPresent();
     }
 
     @Override
-    public void unscheduleByKey( final ApplicationKey key )
+    public boolean unscheduleByKey( final ApplicationKey key )
     {
-        this.tasks.keySet().
+        final Optional<JobDescriptor> job = this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getApplicationKey().equals( key ) ).
-            findFirst().ifPresent( this::doUnschedule );
+            findFirst();
+
+        return job.filter( this::doUnschedule ).isPresent();
+
     }
 
 
@@ -83,10 +85,22 @@ public final class JobSchedulerImpl
     }
 
     @Override
-    public void reschedule( final JobExecutionTask task )
+    public void reschedule( final JobDescriptor jobDescriptor )
     {
+        final JobExecutionTask task = tasks.get( jobDescriptor );
+
+        if ( task == null )
+        {
+            LOG.warn( "Can't reschedule task: " + jobDescriptor.getName() );
+            return;
+        }
+
         final long delay = task.getDescriptor().nextExecution().toMillis();
-        this.timer.schedule( new JobExecutionTask( task ), delay );
+
+        final JobExecutionTask newTask = new JobExecutionTask( task );
+
+        this.tasks.put( jobDescriptor, newTask );
+        this.timer.schedule( newTask, delay );
     }
 
     @Override
@@ -124,10 +138,21 @@ public final class JobSchedulerImpl
 
     }
 
-    private void doUnschedule( final JobDescriptor job )
+    private boolean doUnschedule( final JobDescriptor job )
     {
-        final TimerTask task = this.tasks.remove( job );
-        task.cancel();
+        final JobExecutionTask task = this.tasks.remove( job );
+        final boolean result = task.cancel();
+
+        if ( result )
+        {
+            LOG.info( "Removed job: " + job.getDescription() );
+        }
+        else
+        {
+            LOG.warn( "Can't remove job: " + job.getDescription() );
+        }
+
+        return result;
     }
 
     @Reference
