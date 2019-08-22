@@ -18,7 +18,7 @@ To use this library in your JavaScript code, it first needs to be required:
 var cronLib = require('/lib/cron');
 ----
 
-.Schedule
+=== `Schedule`
 
 Next code should be executed to schedule a task:
 
@@ -95,7 +95,7 @@ Where `Context` is:
 
 |===
 
-.Unschedule
+=== `Unschedule`
 
 For unscheduling of run task use `unschedule` method:
 
@@ -115,7 +115,7 @@ var view = cronLib.unschedule(params);
 
 |===
 
-.Reschedule
+=== `Reschedule`
 Rescheduling will stop run task by the name and rerun it with set params, which are equal to `schedule` method params:
 
 
@@ -124,7 +124,7 @@ Rescheduling will stop run task by the name and rerun it with set params, which 
 var view = cronLib.reschedule(params);
 ----
 
-.Fetch
+=== `Fetch`
 
 For fetching a list of current run tasks use `list` method:
 
