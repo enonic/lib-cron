@@ -28,73 +28,23 @@ Next code should be executed to schedule a task:
 var view = cronLib.schedule(params);
 ----
 
-`params` description:
+*Parameters*
 
-[cols="3", options="header"]
-|===
-|Param name
-|Type
-|Description
+The schedule function takes a parameter object with options.
 
-|name
-|string
-|Unique task name.
-
-|cron
-|string
-|Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern])
-
-|times
-|number
-|Number of task runs. Leave it empty for infinite calls.
-
-|callback
-|Function
-|Code of task which should be called.
-
-|context
-|Context
-|Context of the task run.
-
-|===
-
-Where `Context` is:
-
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
-
-|repository
-|string
-|Repository id.
-
- |branch
- |string
- |Branch name.
-
-  |principals
-  |string[]
-  |Principal keys of groups or roles.
-
-  |attributes
-  |Object
-  |Map of context attributes.
-
- |user
- |Object
- |User credentials.
-
-|user.login
-|string
-|User name.
-
-|user.userStore
-|string
-|Name of userStore.
-
-|===
+* `options` (_object_) Parameters to schedule a task.
+** `*name*` (_string_) Unique task name.
+** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]).
+** `*times*` (_number_) Number of task runs. Leave it empty for infinite calls.
+** `*callback*` (_function_) Code of task which should be called.
+** `*context*` (_object_) Context of the task run.
+*** `*repository*` (_string_) User name for basic authentication.
+*** `*branch*` (_string_) Password for basic authentication.
+*** `*principals*` (_string[]_) Principal keys of groups or roles.
+*** `*attributes*` (_object_) Map of context attributes.
+*** `*user*` (_object_) User credentials.
+**** `*login*` (_string_) User login.
+**** `*userStore*` (_string_) Name of userStore.
 
 === `Unschedule`
 
@@ -104,17 +54,13 @@ For unscheduling of run task use `unschedule` method:
 ----
 var view = cronLib.unschedule(params);
 ----
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
 
-|name
-|string
-|Name of a scheduled task.
+*Parameters*
 
-|===
+The unschedule function takes a parameter object with only one option - run task name:
+
+* `options` (_object_) Parameters to unschedule a task.
+** `*name*` (_string_) Name of a scheduled task.
 
 === `Reschedule`
 Rescheduling will stop run task by the name and rerun it with set params, which are equal to `schedule` method params:
@@ -134,44 +80,22 @@ To get particular task use `get` method:
 var task = cronLib.get(params);
 ----
 
-Where `params` is:
+*Parameters*
 
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
+The get function takes a parameter object with only one option - run task name:
 
-|name
-|string
-|Name of a scheduled task.
-
-|===
+* `options` (_object_) Parameters to get task info.
+** `*name*` (_string_) Name of a scheduled task.
 
 And the result is task mapper object, which contains description of run task:
 
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
+*Result*
 
-|name
-|string
-|Name of a scheduled task.
-
-|cron
-|string
-|Human readable description of UINX cron pattern.
-
-|applicationKey
-|string
-|Key of application has run the task.
-
-|context
-|Object
-|Contains information about task context(repo, branch, authInfo).
-|===
+* `result` (_object_) task mapper object.
+** `*name*` (_string_) Name of a scheduled task.
+** `*cron*` (_string_) Human readable description of UINX cron pattern.
+** `*applicationKey*` (_string_) Key of application has run the task.
+** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
 
 For fetching a list of current run tasks use `list` method:
 
