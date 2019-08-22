@@ -1,5 +1,6 @@
 = Cron library
 
+image::https://img.shields.io/badge/xp-6.15.7+-blue.svg[role="right"]
 To start using this library, add the following into your `build.gradle` file:
 
 [source,groovy]
@@ -27,73 +28,23 @@ Next code should be executed to schedule a task:
 var view = cronLib.schedule(params);
 ----
 
-`params` description:
+*Parameters*
 
-[cols="3", options="header"]
-|===
-|Param name
-|Type
-|Description
+The schedule function takes a parameter object with options.
 
-|name
-|string
-|Unique task name.
-
-|cron
-|string
-|cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern])
-
-|times
-|number
-|number of task runs. Leave it empty for infinite calls.
-
-|callback
-|Function
-|code of task which should be called.
-
-|context
-|Context
-|context of the task.
-
-|===
-
-Where `Context` is:
-
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
-
-|repository
-|string
-|Repository id.
-
- |branch
- |string
- |Branch name.
-
-  |principals
-  |string[]
-  |Principal keys.
-
-  |attributes
-  |Object
-  |Map of context attributes.
-
- |user
- |Object
- |User credentials.
-
-|user.login
-|string
-|User name.
-
-|user.userStore
-|string
-|Name of userStore.
-
-|===
+* `options` (_object_) Parameters to schedule a task.
+** `*name*` (_string_) Unique task name.
+** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]).
+** `*times*` (_number_) Number of task runs. Leave it empty for infinite calls.
+** `*callback*` (_function_) Code of task which should be called.
+** `*context*` (_object_) Context of the task run.
+*** `*repository*` (_string_) User name for basic authentication.
+*** `*branch*` (_string_) Password for basic authentication.
+*** `*principals*` (_string[]_) Principal keys of groups or roles.
+*** `*attributes*` (_object_) Map of context attributes.
+*** `*user*` (_object_) User credentials.
+**** `*login*` (_string_) User login.
+**** `*userStore*` (_string_) Name of userStore.
 
 === `Unschedule`
 
@@ -103,17 +54,13 @@ For unscheduling of run task use `unschedule` method:
 ----
 var view = cronLib.unschedule(params);
 ----
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
 
-|name
-|string
-|Name of a scheduled task.
+*Parameters*
 
-|===
+The unschedule function takes a parameter object with only one option - run task name:
+
+* `options` (_object_) Parameters to unschedule a task.
+** `*name*` (_string_) Name of a scheduled task.
 
 === `Reschedule`
 Rescheduling will stop run task by the name and rerun it with set params, which are equal to `schedule` method params:
@@ -126,30 +73,114 @@ var view = cronLib.reschedule(params);
 
 === `Fetch`
 
+To get particular task use `get` method:
+
+[source,js]
+----
+var task = cronLib.get(params);
+----
+
+*Parameters*
+
+The get function takes a parameter object with only one option - run task name:
+
+* `options` (_object_) Parameters to get task info.
+** `*name*` (_string_) Name of a scheduled task.
+
+And the result is task mapper object, which contains description of run task:
+
+*Result*
+
+* `result` (_object_) task mapper object.
+** `*name*` (_string_) Name of a scheduled task.
+** `*cron*` (_string_) Human readable description of UINX cron pattern.
+** `*applicationKey*` (_string_) Key of application has run the task.
+** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
+
 For fetching a list of current run tasks use `list` method:
 
 [source,js]
 ----
-var view = cronLib.list();
+var taskArray = cronLib.list();
 ----
 
-For getting particular one use `get` method:
+Result is an array of task mapper objects, described above.
+
+== Examples
+
+=== `Schedule`
+[source,js]
+----
+var cron = require('/lib/cron');
+
+cron.schedule({
+    name: 'myTask',
+    cron: '0 * * * *',<1>
+    times: 5,<2>
+    callback: {
+        alert('Task is called');
+    },
+    context: {
+        repository: 'my-repo',
+        branch: 'master',
+        principals: ['role:system.admin'],<3>
+        user: {
+            login: 'su',
+            userStore: 'system'
+        }
+    }
+});
+----
+<1> Callback will be run every hour.
+<2> Callback will be run 5 times.
+<3> System admin role will be used for task run.
+
+`reschedule` method is using the same list of parameters.
+
+
+=== `Unschedule`
+[source,js]
+----
+var cron = require('/lib/cron');
+
+cron.unschedule({
+    name: 'myTask' <1>
+    });
+----
+<1> Name of the previously scheduled task. Useful for interruption of tasks without set `times` param.
+
+=== `Get`
 
 [source,js]
 ----
-var view = cronLib.get(params);
+var cron = require('/lib/cron');
+
+var task = cron.get({
+    name: 'myTask'
+    });
+
+task == { "name": "myTask",
+          "cron": "every hour",
+          "applicationKey": "com.enonic.app.features",
+          "context": {
+            "branch": "master",
+            "repository": "my-repo",
+            "authInfo": {
+              "user": {
+                "type": "user",
+                "key": "user:system:su",
+                "displayName": "Super User",
+                "disabled": false,
+                "login": "su",
+                "idProvider": "system"
+              },
+              "principals": [
+                "role:system.admin",
+                "role:system.authenticated",
+                "role:system.everyone",
+                "user:system:su"
+              ]
+            }
+          }
+        }
 ----
-
-Where `params` is:
-
-[cols="1,1,3", options="header"]
-|===
-|Param name
-|Type
-|Description
-
-|name
-|string
-|Name of a scheduled task.
-
-|===
