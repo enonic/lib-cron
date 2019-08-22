@@ -1,7 +1,6 @@
 = Cron library
 
 image::https://img.shields.io/badge/xp-6.15.7+-blue.svg[role="right"]
-
 To start using this library, add the following into your `build.gradle` file:
 
 [source,groovy]
@@ -235,8 +234,7 @@ var cron = require('/lib/cron');
 var task = cron.get({
     name: 'myTask'
     });
----
-[source,js]
+
 task == { "name": "myTask",
           "cron": "every hour",
           "applicationKey": "com.enonic.app.features",
