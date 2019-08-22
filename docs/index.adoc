@@ -1,0 +1,155 @@
+= Cron library
+
+To start using this library, add the following into your `build.gradle` file:
+
+[source,groovy]
+----
+dependencies {
+  include 'com.enonic.lib:lib-cron:{version}'
+}
+----
+
+== Usage
+
+To use this library in your JavaScript code, it first needs to be required:
+
+[source,js]
+----
+var cronLib = require('/lib/cron');
+----
+
+.Schedule
+
+Next code should be executed to schedule a task:
+
+[source,js]
+----
+var view = cronLib.schedule(params);
+----
+
+`params` description:
+
+[cols="3", options="header"]
+|===
+|Param name
+|Type
+|Description
+
+|name
+|string
+|Unique task name.
+
+|cron
+|string
+|cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern])
+
+|times
+|number
+|number of task runs. Leave it empty for infinite calls.
+
+|callback
+|Function
+|code of task which should be called.
+
+|context
+|Context
+|context of the task.
+
+|===
+
+Where `Context` is:
+
+[cols="1,1,3", options="header"]
+|===
+|Param name
+|Type
+|Description
+
+|repository
+|string
+|Repository id.
+
+ |branch
+ |string
+ |Branch name.
+
+  |principals
+  |string[]
+  |Principal keys.
+
+  |attributes
+  |Object
+  |Map of context attributes.
+
+ |user
+ |Object
+ |User credentials.
+
+|user.login
+|string
+|User name.
+
+|user.userStore
+|string
+|Name of userStore.
+
+|===
+
+.Unschedule
+
+For unscheduling of run task use `unschedule` method:
+
+[source,js]
+----
+var view = cronLib.unschedule(params);
+----
+[cols="1,1,3", options="header"]
+|===
+|Param name
+|Type
+|Description
+
+|name
+|string
+|Name of a scheduled task.
+
+|===
+
+.Reschedule
+Rescheduling will stop run task by the name and rerun it with set params, which are equal to `schedule` method params:
+
+
+[source,js]
+----
+var view = cronLib.reschedule(params);
+----
+
+.Fetch
+
+For fetching a list of current run tasks use `list` method:
+
+[source,js]
+----
+var view = cronLib.list();
+----
+
+For getting particular one use `get` method:
+
+[source,js]
+----
+var view = cronLib.get(params);
+----
+
+Where `params` is:
+
+[cols="1,1,3", options="header"]
+|===
+|Param name
+|Type
+|Description
+
+|name
+|string
+|Name of a scheduled task.
+
+|===

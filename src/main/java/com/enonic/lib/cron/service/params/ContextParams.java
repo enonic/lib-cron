@@ -17,12 +17,12 @@ public final class ContextParams
 
     protected PrincipalKey[] principals;
 
+    protected Map<String, Object> attributes;
+
     public void setRepository( final String repository )
     {
         this.repository = repository;
     }
-
-    protected Map<String, Object> attributes;
 
     public void setBranch( final String branch )
     {
