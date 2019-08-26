@@ -118,7 +118,7 @@ cron.schedule({
     cron: '0 * * * *',<1>
     times: 5,<2>
     callback: {
-        alert('Task is called');
+        log.info('Task is called');
     },
     context: {
         repository: 'my-repo',
