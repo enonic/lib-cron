@@ -12,11 +12,11 @@ Cron library allows you to schedule tasks and run them in background threads.
 
 |0.1.0
 |6.15.7
-|com.enonic.lib:lib-thymeleaf:0.1.0
+|com.enonic.lib:lib-cron:0.1.0
 
 |1.0.0-SNAPSHOT
 |7.0.x
-|com.enonic.lib:lib-thymeleaf:1.0.0-SNAPSHOT
+|com.enonic.lib:lib-cron:1.0.0-SNAPSHOT
 
 |===
 
