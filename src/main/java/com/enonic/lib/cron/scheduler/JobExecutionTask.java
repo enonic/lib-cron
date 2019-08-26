@@ -16,7 +16,7 @@ final class JobExecutionTask
     private final JobRunner runner;
 
     private final Function<JobDescriptor, Boolean> runCheckFunction =
-        ( JobDescriptor o ) -> o.getTimes().isEmpty() || this.runCount < o.getTimes().get();
+        ( JobDescriptor o ) -> !o.getTimes().isPresent() || this.runCount < o.getTimes().get();
 
     private Integer runCount;
 
