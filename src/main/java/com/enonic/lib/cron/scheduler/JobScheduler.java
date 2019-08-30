@@ -14,7 +14,7 @@ public interface JobScheduler
 
     boolean unschedule( String name );
 
-    boolean unscheduleByKey( ApplicationKey key );
+    int unscheduleByKey( ApplicationKey key );
 
     JobDescriptor get( String name );
 

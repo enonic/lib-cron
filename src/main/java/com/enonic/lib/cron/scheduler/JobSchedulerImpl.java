@@ -1,9 +1,10 @@
 package com.enonic.lib.cron.scheduler;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
@@ -65,15 +66,16 @@ public final class JobSchedulerImpl
     }
 
     @Override
-    public boolean unscheduleByKey( final ApplicationKey key )
+    public int unscheduleByKey( final ApplicationKey key )
     {
-        final Optional<JobDescriptor> job = this.tasks.keySet().
+        final List<JobDescriptor> jobs = this.tasks.keySet().
             stream().
             filter( jobDescriptor -> jobDescriptor.getApplicationKey().equals( key ) ).
-            findFirst();
+            collect( Collectors.toList() );
 
-        return job.filter( this::doUnschedule ).isPresent();
+        jobs.forEach( this::doUnschedule );
 
+        return jobs.size();
     }
 
 

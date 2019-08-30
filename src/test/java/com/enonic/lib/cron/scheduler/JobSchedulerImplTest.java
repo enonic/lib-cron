@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
+import com.enonic.xp.app.ApplicationKey;
 
 public class JobSchedulerImplTest
 {
@@ -68,7 +69,7 @@ public class JobSchedulerImplTest
 
         Thread.sleep( 200 );
 
-        Assert.assertTrue( this.scheduler.unschedule( job.getName() ));
+        Assert.assertTrue( this.scheduler.unschedule( job.getName() ) );
         this.scheduler.deactivate();
     }
 
@@ -85,8 +86,39 @@ public class JobSchedulerImplTest
 
         Thread.sleep( 1000 );
 
-        Assert.assertFalse( this.scheduler.unschedule( job.getName() ));
+        Assert.assertFalse( this.scheduler.unschedule( job.getName() ) );
         this.scheduler.deactivate();
     }
+
+    @Test
+    public void testUnscheduleByKey()
+    {
+        final ApplicationKey applicationKey1 = ApplicationKey.from( "app1" );
+        final ApplicationKey applicationKey2 = ApplicationKey.from( "app2" );
+
+        final JobDescriptor job1 = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job1.getApplicationKey() ).thenReturn( applicationKey1 );
+        Mockito.when( job1.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
+
+        final JobDescriptor job2 = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job2.getApplicationKey() ).thenReturn( applicationKey1 );
+        Mockito.when( job2.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
+
+        final JobDescriptor job3 = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job3.getApplicationKey() ).thenReturn( applicationKey2 );
+        Mockito.when( job3.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
+
+        final JobDescriptors jobs = new JobDescriptors();
+        jobs.add( job1 );
+        jobs.add( job2 );
+        jobs.add( job3 );
+
+        scheduler.schedule( jobs );
+
+        int result = scheduler.unscheduleByKey( applicationKey1 );
+
+        Assert.assertEquals( 2, result );
+    }
+
 }
 
