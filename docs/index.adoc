@@ -93,7 +93,8 @@ And the result is task mapper object, which contains description of run task:
 
 * `result` (_object_) task mapper object.
 ** `*name*` (_string_) Name of a scheduled task.
-** `*cron*` (_string_) Human readable description of UINX cron pattern.
+** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]).
+** `*cronDescription*` (_string_) Human readable description of UINX cron pattern.
 ** `*applicationKey*` (_string_) Key of application has run the task.
 ** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
 
@@ -160,7 +161,8 @@ var task = cron.get({
     });
 
 task == { "name": "myTask",
-          "cron": "every hour",
+          "cron": "0 * * * *",
+          "cronDescription": "every hour",
           "applicationKey": "com.enonic.app.features",
           "context": {
             "branch": "master",

@@ -20,6 +20,7 @@ public final class JobDescriptorMapper
     {
         gen.value( "name", this.jobDescriptor.getName() );
         gen.value( "cron", this.jobDescriptor.getCron() );
+        gen.value( "cronDescription", this.jobDescriptor.getCronDescription() );
         gen.value( "applicationKey", this.jobDescriptor.getApplicationKey().toString() );
         serializeContext( gen, this.jobDescriptor.getContext() );
     }
