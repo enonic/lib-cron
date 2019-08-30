@@ -1,4 +1,4 @@
-package com.enonic.lib.cron.service.params;
+package com.enonic.lib.cron.model.params;
 
 import java.util.Map;
 

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import com.enonic.lib.cron.context.ContextFactory;
-import com.enonic.lib.cron.service.params.ScheduleParams;
+import com.enonic.lib.cron.model.params.ScheduleParams;
 import com.enonic.xp.context.Context;
 
 

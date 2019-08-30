@@ -1,6 +1,4 @@
-package com.enonic.lib.cron.service.params;
-
-import java.util.concurrent.Callable;
+package com.enonic.lib.cron.model.params;
 
 public class ListJobsParams
 {

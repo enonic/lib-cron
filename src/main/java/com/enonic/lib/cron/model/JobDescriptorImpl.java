@@ -8,10 +8,8 @@ import java.util.concurrent.Callable;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.Context;
-import com.enonic.xp.resource.ResourceKey;
 
 final class JobDescriptorImpl
     implements JobDescriptor

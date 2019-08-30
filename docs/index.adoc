@@ -117,7 +117,7 @@ cron.schedule({
     name: 'myTask',
     cron: '0 * * * *',<1>
     times: 5,<2>
-    callback: {
+    callback: function() {
         log.info('Task is called');
     },
     context: {
