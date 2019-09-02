@@ -1,6 +1,6 @@
 = Cron library
 
-image::https://img.shields.io/badge/xp-6.15.7+-blue.svg[role="right"]
+image::https://img.shields.io/badge/xp-7.0.0+-blue.svg[role="right"]
 To start using this library, add the following into your `build.gradle` file:
 
 [source,groovy]
@@ -21,7 +21,7 @@ var cronLib = require('/lib/cron');
 
 === `Schedule`
 
-Next code should be executed to schedule a task:
+Use the following code to schedule a task:
 
 [source,js]
 ----
@@ -48,7 +48,7 @@ The schedule function takes a parameter object with options.
 
 === `Unschedule`
 
-For unscheduling of run task use `unschedule` method:
+Use `unschedule` method to unschedule a scheduled task:
 
 [source,js]
 ----
@@ -63,7 +63,7 @@ The unschedule function takes a parameter object with only one option - run task
 ** `*name*` (_string_) Name of a scheduled task.
 
 === `Reschedule`
-Rescheduling will stop run task by the name and rerun it with set params, which are equal to `schedule` method params:
+Rescheduling will stop a scheduled task by the name and rerun it using parameters similar to arguments of the `schedule` method:
 
 
 [source,js]
@@ -73,7 +73,7 @@ var view = cronLib.reschedule(params);
 
 === `Fetch`
 
-To get particular task use `get` method:
+To get an instance of a particular task use `get` method:
 
 [source,js]
 ----
@@ -82,7 +82,7 @@ var task = cronLib.get(params);
 
 *Parameters*
 
-The get function takes a parameter object with only one option - run task name:
+The get function takes a parameter object with only one option - task name:
 
 * `options` (_object_) Parameters to get task info.
 ** `*name*` (_string_) Name of a scheduled task.
@@ -98,7 +98,7 @@ And the result is task mapper object, which contains description of run task:
 ** `*applicationKey*` (_string_) Key of application has run the task.
 ** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
 
-For fetching a list of current run tasks use `list` method:
+To fetch a list of all scheduled tasks use `list` method:
 
 [source,js]
 ----
