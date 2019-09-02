@@ -1,0 +1,7 @@
+Other software licenses used by this product:
+
+    Cron Utils
+    Apache License 2.0
+    https://github.com/jmrozanec/cron-utils/blob/master/LICENSE
+
+
