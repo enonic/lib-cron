@@ -1,4 +1,4 @@
-package com.enonic.lib.cron.service.mapper;
+package com.enonic.lib.cron.mapper;
 
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.xp.script.serializer.MapGenerator;

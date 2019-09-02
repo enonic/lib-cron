@@ -8,10 +8,8 @@ import java.util.concurrent.Callable;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-
 import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.Context;
-import com.enonic.xp.resource.ResourceKey;
 
 final class JobDescriptorImpl
     implements JobDescriptor
@@ -28,9 +26,12 @@ final class JobDescriptorImpl
 
     private final Context context;
 
+    private final String cron;
+
     private JobDescriptorImpl( final Builder builder )
     {
         this.name = builder.name;
+        this.cron = builder.cron;
         try
         {
             this.trigger = CronTrigger.from( builder.cron );
@@ -54,8 +55,15 @@ final class JobDescriptorImpl
     @Override
     public String getCron()
     {
+        return cron;
+    }
+
+    @Override
+    public String getCronDescription()
+    {
         return trigger.toString();
     }
+
 
     @Override
     public Duration nextExecution()
@@ -88,7 +96,7 @@ final class JobDescriptorImpl
     @Override
     public String getDescription()
     {
-        return this.name + " @ " + this.trigger.toString();
+        return this.name + " @ " + this.cron + " (" +this.trigger.toString() + ")";
     }
 
 

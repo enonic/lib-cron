@@ -14,7 +14,9 @@ public interface JobDescriptor
 
     String getCron();
 
-   Callable<Object> getScript();
+    String getCronDescription();
+
+    Callable<Object> getScript();
 
     ApplicationKey getApplicationKey();
 

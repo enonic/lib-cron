@@ -64,4 +64,4 @@ jar {
     from '*.class'
 }
 
-jar.dependsOn copyPropertyFiles, copyClassFiles
+processResources.dependsOn copyPropertyFiles, copyClassFiles

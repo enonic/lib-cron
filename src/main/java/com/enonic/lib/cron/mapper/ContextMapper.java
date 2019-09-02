@@ -1,4 +1,4 @@
-package com.enonic.lib.cron.service.mapper;
+package com.enonic.lib.cron.mapper;
 
 import com.enonic.xp.context.Context;
 import com.enonic.xp.lib.common.PrincipalMapper;

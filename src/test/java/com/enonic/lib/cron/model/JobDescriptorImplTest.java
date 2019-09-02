@@ -1,15 +1,10 @@
 package com.enonic.lib.cron.model;
 
-import java.util.concurrent.Callable;
-
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.junit.Test;
 
-import jdk.nashorn.api.scripting.NashornScriptEngine;
-
-import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.ContextAccessor;
 
 import static org.junit.Assert.*;
@@ -29,7 +24,8 @@ public class JobDescriptorImplTest
 
         final JobDescriptor descriptor = builder.build();
         assertEquals( "myJob", descriptor.getName() );
-        assertEquals( "myJob @ every minute", descriptor.getDescription() );
+        assertEquals( "* * * * *", descriptor.getCron() );
+        assertEquals( "myJob @ * * * * * (every minute)", descriptor.getDescription() );
         assertEquals( "myJob", descriptor.toString() );
         assertNotNull( descriptor.nextExecution() );
     }

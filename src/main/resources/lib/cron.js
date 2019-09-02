@@ -1,4 +1,4 @@
-var service = __.newBean('com.enonic.lib.cron.service.CronService');
+var service = __.newBean('com.enonic.lib.cron.handler.LibCronHandler');
 
 function schedule(params) {
 
