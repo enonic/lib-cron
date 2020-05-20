@@ -3,7 +3,6 @@ package com.enonic.lib.cron.scheduler;
 import java.time.Duration;
 import java.util.Optional;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -11,7 +10,9 @@ import org.mockito.Mockito;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
-import com.enonic.xp.app.ApplicationKey;
+
+import static org.junit.Assert.*;
+
 
 public class JobSchedulerImplTest
 {
@@ -60,17 +61,29 @@ public class JobSchedulerImplTest
     public void testStop()
         throws Exception
     {
-        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job.nextExecution() ).thenReturn( Duration.ofMillis( 100000 ) );
-        Mockito.when( job.getName() ).thenReturn( "jobName" );
-        Mockito.when( job.getTimes() ).thenReturn( Optional.of( 5 ) );
+        final JobDescriptor job1 = Mockito.mock( JobDescriptor.class );
+        final JobDescriptor job2 = Mockito.mock( JobDescriptor.class );
+        final JobDescriptor job3 = Mockito.mock( JobDescriptor.class );
 
-        this.scheduler.schedule( job );
+        Mockito.when( job1.nextExecution() ).thenReturn( Duration.ofMillis( 100000 ) );
+        Mockito.when( job2.nextExecution() ).thenReturn( Duration.ofMillis( 1 ) );
+        Mockito.when( job3.nextExecution() ).thenReturn( Duration.ofMillis( 500 ) );
 
-        Thread.sleep( 200 );
+        Mockito.when( job1.getName() ).thenReturn( "jobName1" );
+        Mockito.when( job2.getName() ).thenReturn( "jobName2" );
+        Mockito.when( job3.getName() ).thenReturn( "jobName3" );
 
-        Assert.assertTrue( this.scheduler.unschedule( job.getName() ) );
+        this.scheduler.schedule( job1 );
+        this.scheduler.schedule( job2 );
+        this.scheduler.schedule( job3 );
+
+        Thread.sleep( 1000 );
+
+        assertTrue( this.scheduler.unschedule( job1.getName() ) );
+
+        assertEquals( 2, this.scheduler.list( "jobName\\d+" ).size() );
         this.scheduler.deactivate();
+        assertEquals( 0, this.scheduler.list( "jobName\\d+" ).size() );
     }
 
     @Test
@@ -86,38 +99,8 @@ public class JobSchedulerImplTest
 
         Thread.sleep( 1000 );
 
-        Assert.assertFalse( this.scheduler.unschedule( job.getName() ) );
+        assertFalse( this.scheduler.unschedule( job.getName() ) );
         this.scheduler.deactivate();
-    }
-
-    @Test
-    public void testUnscheduleByKey()
-    {
-        final ApplicationKey applicationKey1 = ApplicationKey.from( "app1" );
-        final ApplicationKey applicationKey2 = ApplicationKey.from( "app2" );
-
-        final JobDescriptor job1 = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job1.getApplicationKey() ).thenReturn( applicationKey1 );
-        Mockito.when( job1.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
-
-        final JobDescriptor job2 = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job2.getApplicationKey() ).thenReturn( applicationKey1 );
-        Mockito.when( job2.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
-
-        final JobDescriptor job3 = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job3.getApplicationKey() ).thenReturn( applicationKey2 );
-        Mockito.when( job3.nextExecution() ).thenReturn( Duration.ofMillis( 3600 ) );
-
-        final JobDescriptors jobs = new JobDescriptors();
-        jobs.add( job1 );
-        jobs.add( job2 );
-        jobs.add( job3 );
-
-        scheduler.schedule( jobs );
-
-        int result = scheduler.unscheduleByKey( applicationKey1 );
-
-        Assert.assertEquals( 2, result );
     }
 
 }

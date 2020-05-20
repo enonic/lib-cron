@@ -1,10 +1,8 @@
 package com.enonic.lib.cron.scheduler;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Component;
@@ -18,7 +16,6 @@ import com.google.common.collect.Maps;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.runner.JobRunner;
-import com.enonic.xp.app.ApplicationKey;
 
 @Component(immediate = true)
 public final class JobSchedulerImpl
@@ -62,22 +59,9 @@ public final class JobSchedulerImpl
             filter( jobDescriptor -> jobDescriptor.getName().equals( jobName ) ).
             findFirst();
 
-        return job.filter( this::doUnschedule ).isPresent();
+        return job.map( this::doUnschedule ).
+            orElse( false );
     }
-
-    @Override
-    public int unscheduleByKey( final ApplicationKey key )
-    {
-        final List<JobDescriptor> jobs = this.tasks.keySet().
-            stream().
-            filter( jobDescriptor -> jobDescriptor.getApplicationKey().equals( key ) ).
-            collect( Collectors.toList() );
-
-        jobs.forEach( this::doUnschedule );
-
-        return jobs.size();
-    }
-
 
     @Override
     public void schedule( final JobDescriptor job )
@@ -108,13 +92,11 @@ public final class JobSchedulerImpl
     @Override
     public JobDescriptor get( final String jobName )
     {
-        final Optional<JobDescriptor> jobDescriptor = this.tasks.keySet().
+        return this.tasks.keySet().
             stream().
             filter( desc -> desc.getName().equals( jobName ) ).
-            findFirst();
-
-        return jobDescriptor.orElse( null );
-
+            findFirst().
+            orElse( null );
     }
 
     @Override
