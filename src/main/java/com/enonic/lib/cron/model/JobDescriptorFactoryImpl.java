@@ -1,5 +1,7 @@
 package com.enonic.lib.cron.model;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -20,7 +22,12 @@ public final class JobDescriptorFactoryImpl
 
     private ContextFactory contextFactory;
 
-    @Override
+    @Activate
+    public void setup( final BundleContext bundleContext )
+    {
+        return;
+    }
+
     public JobDescriptor create( final ScheduleParams params, final Context defaultContext )
     {
         JobDescriptorImpl.Builder builder = parseJob( params );
@@ -54,7 +61,7 @@ public final class JobDescriptorFactoryImpl
             name( params.getName() ).
             cron( params.getCron() ).
             script( params.getScript() ).
-            times(params.getTimes()).
+            times( params.getTimes() ).
             applicationKey( params.getApplicationKey() );
     }
 

@@ -1,7 +1,5 @@
 package com.enonic.lib.cron.model.params;
 
-import java.util.concurrent.Callable;
-
 public class ScheduleParams
 {
     protected String name;
@@ -12,7 +10,7 @@ public class ScheduleParams
 
     protected Integer times;
 
-    protected Callable<Object> script;
+    protected Runnable script;
 
     protected ContextParams context;
 
@@ -45,10 +43,9 @@ public class ScheduleParams
         return this;
     }
 
-    public ScheduleParams setScript( final Callable<Object> script )
+    public Runnable getScript()
     {
-        this.script = script;
-        return this;
+        return script;
     }
 
     public ScheduleParams setContext( final ContextParams context )
@@ -77,9 +74,10 @@ public class ScheduleParams
         return times;
     }
 
-    public Callable<Object> getScript()
+    public ScheduleParams setScript( final Runnable script )
     {
-        return script;
+        this.script = script;
+        return this;
     }
 
     public ContextParams getContext()

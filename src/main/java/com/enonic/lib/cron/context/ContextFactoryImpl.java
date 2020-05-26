@@ -5,8 +5,6 @@ import java.util.concurrent.Callable;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.enonic.lib.cron.model.params.ContextParams;
 import com.enonic.xp.context.Context;
@@ -26,13 +24,10 @@ import com.enonic.xp.security.auth.VerifiedUsernameAuthToken;
 public final class ContextFactoryImpl
     implements ContextFactory
 {
-    private final static Logger LOG = LoggerFactory.getLogger( ContextFactoryImpl.class );
-
     private SecurityService securityService;
 
     private Context defaultContext;
 
-    @Override
     public Context create( final ContextParams params, final Context defaultContext )
     {
         this.defaultContext = defaultContext != null ? defaultContext : ContextAccessor.current();

@@ -3,75 +3,106 @@ package com.enonic.lib.cron.scheduler;
 import java.time.Duration;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
-import com.enonic.lib.cron.runner.JobRunner;
+import com.enonic.xp.context.ContextAccessor;
 
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JobSchedulerImplTest
+    extends BundleBasedTest
 {
     private JobSchedulerImpl scheduler;
 
-    private JobRunner runner;
+    private ScriptEngine engine;
 
-    @Before
+    @BeforeEach
     public void setup()
+        throws Exception
     {
-        this.runner = Mockito.mock( JobRunner.class );
+        super.setup();
         this.scheduler = new JobSchedulerImpl();
-        this.scheduler.setRunner( this.runner );
+        this.scheduler.setup( getBundleContext() );
+
+        final ScriptEngineManager engineManager = new ScriptEngineManager();
+        engine = engineManager.getEngineByName( "nashorn" );
+    }
+
+    @AfterEach
+    public void deactivate()
+    {
+        this.scheduler.deactivate();
     }
 
     @Test
     public void testRun()
         throws Exception
     {
-        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job.nextExecution() ).thenReturn( Duration.ofMillis( 190 ) );
-        Mockito.when( job.getName() ).thenReturn( "jobName" );
+        final JobDescriptor job = mockJob( "jobName1", Duration.ofMillis( 100000 ) );
 
-        final JobDescriptors jobs = new JobDescriptors();
-        jobs.add( job );
+        this.scheduler.schedule( job );
 
-        this.scheduler.schedule( jobs );
+        Thread.sleep( 1000 );
 
-        Thread.sleep( 200 );
-        Mockito.verify( this.runner, Mockito.times( 1 ) ).run( job );
-
-        this.scheduler.unschedule( job.getName() );
-        this.scheduler.deactivate();
+        assertEquals( job, this.scheduler.get( "jobName1" ) );
     }
 
     @Test
-    public void testRun_nothing()
+    public void testRunMultipleTimes()
+        throws Exception
     {
+        final Runnable script1 = Mockito.mock( Runnable.class );
+        final Runnable script2 = Mockito.mock( Runnable.class );
+
+        final JobDescriptor job1 = mockJob( "jobName1", Duration.ofMillis( 10 ), 3, script1 );
+        final JobDescriptor job2 = mockJob( "jobName2", Duration.ofMillis( 10 ), 1, script2 );
+
         final JobDescriptors jobs = new JobDescriptors();
+        jobs.add( job1 );
+        jobs.add( job2 );
+
         this.scheduler.schedule( jobs );
-        this.scheduler.unschedule( "not_scheduled" );
-        this.scheduler.deactivate();
+
+        Thread.sleep( 1000 );
+
+        Mockito.verify( script1, Mockito.times( 3 ) ).run();
+        Mockito.verify( script2, Mockito.times( 1 ) ).run();
+    }
+
+    @Test
+    public void testReschedule()
+        throws Exception
+    {
+        final Runnable script = Mockito.mock( Runnable.class );
+
+        final JobDescriptor job = mockJob( "jobName1", Duration.ofMillis( 10 ), 2, script );
+
+        this.scheduler.schedule( job );
+        Thread.sleep( 500 );
+        this.scheduler.reschedule( job );
+        Thread.sleep( 500 );
+
+        Mockito.verify( script, Mockito.times( 4 ) ).run();
     }
 
     @Test
     public void testStop()
         throws Exception
     {
-        final JobDescriptor job1 = Mockito.mock( JobDescriptor.class );
-        final JobDescriptor job2 = Mockito.mock( JobDescriptor.class );
-        final JobDescriptor job3 = Mockito.mock( JobDescriptor.class );
-
-        Mockito.when( job1.nextExecution() ).thenReturn( Duration.ofMillis( 100000 ) );
-        Mockito.when( job2.nextExecution() ).thenReturn( Duration.ofMillis( 1 ) );
-        Mockito.when( job3.nextExecution() ).thenReturn( Duration.ofMillis( 500 ) );
-
-        Mockito.when( job1.getName() ).thenReturn( "jobName1" );
-        Mockito.when( job2.getName() ).thenReturn( "jobName2" );
-        Mockito.when( job3.getName() ).thenReturn( "jobName3" );
+        final JobDescriptor job1 = mockJob( "jobName1", Duration.ofMillis( 100000 ) );
+        final JobDescriptor job2 = mockJob( "jobName2", Duration.ofMillis( 100000 ) );
+        final JobDescriptor job3 = mockJob( "jobName3", Duration.ofMillis( 100000 ) );
 
         this.scheduler.schedule( job1 );
         this.scheduler.schedule( job2 );
@@ -87,21 +118,61 @@ public class JobSchedulerImplTest
     }
 
     @Test
-    public void testStopFailed()
+    public void testStopAlreadyFinished()
         throws Exception
     {
-        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
-        Mockito.when( job.nextExecution() ).thenReturn( Duration.ofMillis( 100 ) );
-        Mockito.when( job.getName() ).thenReturn( "jobName" );
-        Mockito.when( job.getTimes() ).thenReturn( Optional.of( 5 ) );
+        final JobDescriptor job = mockJob( "jobName", Duration.ofMillis( 10 ) );
 
         this.scheduler.schedule( job );
 
         Thread.sleep( 1000 );
 
         assertFalse( this.scheduler.unschedule( job.getName() ) );
-        this.scheduler.deactivate();
     }
 
+
+    @Test
+    public void testRunInvalidScript()
+        throws Exception
+    {
+        final Runnable script = () -> {
+            String message = null;
+            try
+            {
+                engine.eval( "(error)" );
+            }
+            catch ( ScriptException e )
+            {
+                message = e.getMessage();
+            }
+
+            assertEquals( "ReferenceError: \"error\" is not defined in <eval> at line number 1", message );
+        };
+
+        final JobDescriptor job = mockJob( "jobName1", Duration.ofMillis( 10 ), 1, script );
+
+        this.scheduler.schedule( job );
+
+        Thread.sleep( 1000 );
+    }
+
+
+    private JobDescriptor mockJob( final String jobName, final Duration nextExec )
+    {
+        return this.mockJob( jobName, nextExec, 1, () -> {
+        } );
+    }
+
+    private JobDescriptor mockJob( final String jobName, final Duration nextExec, final int times, final Runnable script )
+    {
+        final JobDescriptor job = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job.nextExecution() ).thenReturn( nextExec );
+        Mockito.when( job.getName() ).thenReturn( jobName );
+        Mockito.when( job.getTimes() ).thenReturn( Optional.of( times ) );
+        Mockito.when( job.getContext() ).thenReturn( ContextAccessor.current() );
+        Mockito.when( job.getScript() ).thenReturn( script );
+
+        return job;
+    }
 }
 

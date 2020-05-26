@@ -3,7 +3,6 @@ package com.enonic.lib.cron.model;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -18,7 +17,7 @@ final class JobDescriptorImpl
 
     private CronTrigger trigger;
 
-    private final Callable<Object> script;
+    private final Runnable script;
 
     private final ApplicationKey applicationKey;
 
@@ -72,7 +71,7 @@ final class JobDescriptorImpl
     }
 
     @Override
-    public Callable<Object> getScript()
+    public Runnable getScript()
     {
         return this.script;
     }
@@ -138,7 +137,7 @@ final class JobDescriptorImpl
 
         private Integer times;
 
-        private Callable<Object> script;
+        private Runnable script;
 
         private Context context;
 
@@ -154,7 +153,7 @@ final class JobDescriptorImpl
             return this;
         }
 
-        Builder script( final Callable<Object> script )
+        Builder script( final Runnable script )
         {
             this.script = script;
             return this;
