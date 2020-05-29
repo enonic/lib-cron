@@ -1,15 +1,17 @@
 package com.enonic.lib.cron.mapper;
 
-import com.enonic.lib.cron.model.JobDescriptors;
+import java.util.List;
+
+import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.xp.script.serializer.MapGenerator;
 import com.enonic.xp.script.serializer.MapSerializable;
 
 public final class JobDescriptorsMapper
     implements MapSerializable
 {
-    private final JobDescriptors jobDescriptors;
+    private final List<JobDescriptor> jobDescriptors;
 
-    public JobDescriptorsMapper( final JobDescriptors jobDescriptors )
+    public JobDescriptorsMapper( final List<JobDescriptor> jobDescriptors )
     {
         this.jobDescriptors = jobDescriptors;
     }

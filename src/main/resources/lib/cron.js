@@ -1,16 +1,26 @@
 var service = __.newBean('com.enonic.lib.cron.handler.LibCronHandler');
 
+function nullOrValue(value) {
+    if (value === undefined) {
+        return null;
+    }
+
+    return value;
+}
+
 function schedule(params) {
 
     var serviceParams = service.newParams();
     var contextParams = serviceParams.context;
 
-    serviceParams.name = params.name;
-    serviceParams.cron = params.cron;
-    serviceParams.script = params.callback;
-    serviceParams.times = params.times;
+    serviceParams.name = nullOrValue(params.name);
+    serviceParams.cron = nullOrValue(params.cron);
+    serviceParams.delay = nullOrValue(params.delay);
+    serviceParams.fixedDelay = nullOrValue(params.fixedDelay);
+    serviceParams.script = nullOrValue(params.callback);
+    serviceParams.times = nullOrValue(params.times);
 
-    serviceParams.applicationKey = app.name;
+    serviceParams.applicationKey = nullOrValue(app.name);
 
     var context = params.context;
 
