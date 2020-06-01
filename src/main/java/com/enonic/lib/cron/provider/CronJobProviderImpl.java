@@ -1,5 +1,7 @@
 package com.enonic.lib.cron.provider;
 
+import java.util.List;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -9,7 +11,6 @@ import com.enonic.lib.cron.mapper.JobDescriptorMapper;
 import com.enonic.lib.cron.mapper.JobDescriptorsMapper;
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptorFactory;
-import com.enonic.lib.cron.model.JobDescriptors;
 import com.enonic.lib.cron.model.params.ListJobsParams;
 import com.enonic.lib.cron.model.params.ScheduleParams;
 import com.enonic.lib.cron.scheduler.JobScheduler;
@@ -58,9 +59,8 @@ public class CronJobProviderImpl
     @Override
     public JobDescriptorsMapper list( final ListJobsParams params )
     {
-        final JobDescriptors jobDescriptors = this.jobScheduler.list( params.getPattern() );
-
-        return jobDescriptors != null ? new JobDescriptorsMapper( jobDescriptors ) : null;
+        final List<JobDescriptor> jobDescriptors = this.jobScheduler.list( params.getPattern() );
+        return new JobDescriptorsMapper( jobDescriptors );
     }
 
     @Override

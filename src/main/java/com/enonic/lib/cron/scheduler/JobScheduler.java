@@ -1,5 +1,7 @@
 package com.enonic.lib.cron.scheduler;
 
+import java.util.List;
+
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
 
@@ -9,11 +11,9 @@ public interface JobScheduler
 
     void schedule( JobDescriptors jobs );
 
-    void reschedule( JobDescriptor jobDescriptor );
-
-    boolean unschedule( String name );
+    void unschedule( String name );
 
     JobDescriptor get( String name );
 
-    JobDescriptors list( String name );
+    List<JobDescriptor> list( String name );
 }

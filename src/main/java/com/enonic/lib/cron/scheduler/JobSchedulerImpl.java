@@ -1,8 +1,10 @@
 package com.enonic.lib.cron.scheduler;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.osgi.framework.BundleContext;
@@ -11,8 +13,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Maps;
 
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptors;
@@ -26,13 +26,12 @@ public final class JobSchedulerImpl
 
     private RecurringJobScheduler scheduler;
 
-    private Map<JobDescriptor, RecurringJob> tasks;
+    private final Map<JobDescriptor, RecurringJob> tasks = Collections.synchronizedMap( new LinkedHashMap<>() );
 
     @Activate
     public void setup( final BundleContext bundleContext )
     {
         this.scheduler = new RecurringJobScheduler( ApplicationKey.from( bundleContext.getBundle() ) + "-job-thread" );
-        this.tasks = Maps.newHashMap();
     }
 
     @Deactivate
@@ -50,16 +49,9 @@ public final class JobSchedulerImpl
         }
     }
 
-    public boolean unschedule( final String jobName )
+    public void unschedule( final String jobName )
     {
-        final Set<JobDescriptor> descriptors = this.tasks.keySet().
-            stream().
-            filter( jobDescriptor -> jobDescriptor.getName().equals( jobName ) ).
-            collect( Collectors.toSet() );
-
-        descriptors.forEach( this::doUnschedule );
-
-        return !descriptors.isEmpty();
+        doUnschedule( jobName );
     }
 
     public void schedule( final JobDescriptor job )
@@ -67,65 +59,69 @@ public final class JobSchedulerImpl
         doSchedule( job );
     }
 
-    public void reschedule( final JobDescriptor jobDescriptor )
-    {
-        doUnschedule( jobDescriptor );
-        doSchedule( jobDescriptor );
-    }
-
     public JobDescriptor get( final String jobName )
     {
         return this.tasks.keySet().
             stream().
             filter( desc -> desc.getName().equals( jobName ) ).
-            findFirst().
+            findAny().
             orElse( null );
     }
 
-    public JobDescriptors list( final String jobNamePattern )
+    public List<JobDescriptor> list( final String jobNamePattern )
     {
-        final JobDescriptors jobDescriptors = new JobDescriptors();
-
         if ( jobNamePattern == null || jobNamePattern.isBlank() )
         {
-            jobDescriptors.addAll( this.tasks.keySet() );
+            return List.copyOf( this.tasks.keySet() );
         }
         else
         {
-            this.tasks.keySet().
+            return this.tasks.keySet().
                 stream().
                 filter( job -> job.getName().matches( jobNamePattern ) ).
-                forEach( jobDescriptors::add );
+                collect( Collectors.toUnmodifiableList() );
         }
-        return jobDescriptors;
     }
 
     private void doSchedule( final JobDescriptor descriptor )
     {
-        final JobExecutionCommand command = new JobExecutionCommand( descriptor, this::rerunCommand, this::removeCommand );
+        final JobExecutionCommand command = new JobExecutionCommand( descriptor, this::rerunCommandCallback, this::removeCommandCallback );
 
-        final RecurringJob recurringJob = this.scheduler.schedule( command, descriptor.nextExecution() );
+        final RecurringJob recurringJob = this.scheduler.schedule( command );
 
         this.tasks.put( descriptor, recurringJob );
 
-        LOG.info( "Added job: " + descriptor.getDescription() );
+        LOG.info( "Added job: {}", descriptor.getDescription() );
     }
 
-    private void doUnschedule( final JobDescriptor descriptor )
+    private void doUnschedule( final String jobName )
     {
-        Optional.ofNullable( tasks.remove( descriptor ) ).ifPresent( RecurringJob::cancel );
+        for ( final Iterator<Map.Entry<JobDescriptor, RecurringJob>> iterator = this.tasks.entrySet().iterator(); iterator.hasNext(); )
+        {
+            final Map.Entry<JobDescriptor, RecurringJob> entry = iterator.next();
+            final JobDescriptor jobDescriptor = entry.getKey();
+            if ( jobDescriptor.getName().equals( jobName ) )
+            {
+                entry.getValue().cancel();
+                LOG.info( "Job is stopped: {}", jobDescriptor.getDescription() );
 
-        LOG.info( "Job is stopped: " + descriptor.getDescription() );
+                iterator.remove();
+            }
+        }
     }
 
-    private void rerunCommand( final JobExecutionCommand command )
+    private void rerunCommandCallback( final JobExecutionCommand command )
     {
-        final RecurringJob recurringJob = this.scheduler.schedule( command, command.getDescriptor().nextExecution() );
+        final RecurringJob recurringJob = this.scheduler.schedule( command );
         this.tasks.put( command.getDescriptor(), recurringJob );
     }
 
-    private void removeCommand( final JobExecutionCommand command )
+    private void removeCommandCallback( final JobExecutionCommand command )
     {
-        this.tasks.remove( command.getDescriptor() );
+        final RecurringJob job = this.tasks.remove( command.getDescriptor() );
+        if ( job != null )
+        {
+            job.cancel();
+        }
     }
 }

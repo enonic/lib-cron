@@ -1,7 +1,6 @@
 package com.enonic.lib.cron.model;
 
 import java.time.Duration;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
@@ -15,34 +14,33 @@ final class JobDescriptorImpl
 {
     private final String name;
 
-    private CronTrigger trigger;
-
     private final Runnable script;
 
     private final ApplicationKey applicationKey;
-
-    private final Optional<Integer> times;
 
     private final Context context;
 
     private final String cron;
 
+    private final int times;
+
+    private final int delay;
+
+    private final int fixedDelay;
+
+    private final CronTrigger trigger;
+
     private JobDescriptorImpl( final Builder builder )
     {
         this.name = builder.name;
         this.cron = builder.cron;
-        try
-        {
-            this.trigger = CronTrigger.from( builder.cron );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
+        this.trigger = Optional.ofNullable( builder.cron ).map( CronTrigger::from ).orElse( null );
         this.script = builder.script;
         this.applicationKey = builder.applicationKey;
-        this.times = Optional.ofNullable( builder.times );
+        this.times = builder.times;
         this.context = builder.context;
+        this.delay = builder.delay;
+        this.fixedDelay = builder.fixedDelay;
     }
 
     @Override
@@ -60,14 +58,13 @@ final class JobDescriptorImpl
     @Override
     public String getCronDescription()
     {
-        return trigger.toString();
+        return Optional.ofNullable( this.trigger ).map( CronTrigger::toString ).orElse( null );
     }
-
 
     @Override
     public Duration nextExecution()
     {
-        return this.trigger.nextExecution();
+        return Optional.ofNullable( this.trigger ).map( CronTrigger::nextExecution ).orElse( null );
     }
 
     @Override
@@ -82,9 +79,9 @@ final class JobDescriptorImpl
         return applicationKey;
     }
 
-    public Optional<Integer> getTimes()
+    public int getTimes()
     {
-        return times ;
+        return times;
     }
 
     public Context getContext()
@@ -95,36 +92,32 @@ final class JobDescriptorImpl
     @Override
     public String getDescription()
     {
-        return this.name + " @ " + this.cron + " (" +this.trigger.toString() + ")";
+        if ( this.cron != null )
+        {
+            return this.name + " @ " + this.cron + " (" + this.getCronDescription() + ")";
+        }
+        else
+        {
+            return this.name + " @ " + " delay: " + delay + "ms, fixedDelay: " + this.fixedDelay + "ms";
+        }
     }
 
+    @Override
+    public int getDelay()
+    {
+        return delay;
+    }
+
+    @Override
+    public int getFixedDelay()
+    {
+        return fixedDelay;
+    }
 
     @Override
     public String toString()
     {
         return this.name;
-    }
-
-    @Override
-    public boolean equals( final Object o )
-    {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-        final JobDescriptorImpl that = (JobDescriptorImpl) o;
-        return Objects.equals( name, that.name ) && Objects.equals( trigger.toString(), that.trigger.toString() ) &&
-            Objects.equals( applicationKey, that.applicationKey ) && Objects.equals( times, that.times );
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash( name, trigger.toString(), applicationKey, times );
     }
 
     static final class Builder
@@ -135,11 +128,15 @@ final class JobDescriptorImpl
 
         private String cron;
 
-        private Integer times;
-
         private Runnable script;
 
         private Context context;
+
+        private int times = 0;
+
+        private int delay = 0;
+
+        private int fixedDelay = 0;
 
         Builder name( final String name )
         {
@@ -167,7 +164,11 @@ final class JobDescriptorImpl
 
         public Builder times( final Integer times )
         {
-            this.times = times;
+            if ( times != null )
+            {
+                Preconditions.checkArgument( times > 0, "`times` must be bigger then 0." );
+                this.times = times;
+            }
             return this;
         }
 
@@ -177,11 +178,31 @@ final class JobDescriptorImpl
             return this;
         }
 
+        public Builder delay( final Integer delay )
+        {
+            if ( delay != null )
+            {
+                this.delay = delay;
+            }
+            return this;
+        }
+
+        public Builder fixedDelay( final Integer fixedDelay )
+        {
+            if ( fixedDelay != null )
+            {
+                this.fixedDelay = fixedDelay;
+            }
+            return this;
+        }
+
         private void validate()
         {
             Preconditions.checkArgument( !Strings.isNullOrEmpty( name ), "Job name must be set" );
-            Preconditions.checkArgument( !Strings.isNullOrEmpty( cron ), "Job cron must be set" );
             Preconditions.checkArgument( script != null, "Script callback must be set" );
+            Preconditions.checkArgument( ( ( cron == null && fixedDelay > 0 ) || ( cron != null && fixedDelay == 0 ) ),
+                                         "Job cron or fixedDelay bigger then `0` must be set, but not both." );
+            Preconditions.checkArgument( cron == null || delay == 0, "delay cannot be set with cron." );
         }
 
         JobDescriptorImpl build()

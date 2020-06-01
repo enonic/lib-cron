@@ -1,13 +1,9 @@
 package com.enonic.lib.cron.model;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
 
 import com.enonic.lib.cron.context.ContextFactory;
 import com.enonic.lib.cron.model.params.ScheduleParams;
@@ -22,12 +18,6 @@ public final class JobDescriptorFactoryImpl
 
     private ContextFactory contextFactory;
 
-    @Activate
-    public void setup( final BundleContext bundleContext )
-    {
-        return;
-    }
-
     public JobDescriptor create( final ScheduleParams params, final Context defaultContext )
     {
         JobDescriptorImpl.Builder builder = parseJob( params );
@@ -39,29 +29,13 @@ public final class JobDescriptorFactoryImpl
 
     private JobDescriptorImpl.Builder parseJob( final ScheduleParams params )
     {
-        if ( Strings.isNullOrEmpty( params.getName() ) )
-        {
-            LOG.error( "Failed to create job descriptor, name is empty" );
-            return null;
-        }
-
-        if ( Strings.isNullOrEmpty( params.getCron() ) )
-        {
-            LOG.error( "Failed to create job descriptor, cron string is empty" );
-            return null;
-        }
-
-        if ( params.getScript() == null )
-        {
-            LOG.error( "Failed to create job descriptor, callback script is empty" );
-            return null;
-        }
-
         return JobDescriptorImpl.builder().
             name( params.getName() ).
             cron( params.getCron() ).
             script( params.getScript() ).
             times( params.getTimes() ).
+            delay( params.getDelay() ).
+            fixedDelay( params.getFixedDelay() ).
             applicationKey( params.getApplicationKey() );
     }
 

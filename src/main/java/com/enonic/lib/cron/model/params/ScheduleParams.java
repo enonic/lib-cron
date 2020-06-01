@@ -2,17 +2,21 @@ package com.enonic.lib.cron.model.params;
 
 public class ScheduleParams
 {
-    protected String name;
+    private String name;
 
-    protected String cron;
+    private String cron;
 
-    protected String applicationKey;
+    private String applicationKey;
 
-    protected Integer times;
+    private Integer times;
 
-    protected Runnable script;
+    private Runnable script;
 
-    protected ContextParams context;
+    private ContextParams context;
+
+    private Integer delay;
+
+    private Integer fixedDelay;
 
     public ScheduleParams()
     {
@@ -77,6 +81,28 @@ public class ScheduleParams
     public ScheduleParams setScript( final Runnable script )
     {
         this.script = script;
+        return this;
+    }
+
+    public Integer getDelay()
+    {
+        return delay;
+    }
+
+    public ScheduleParams setDelay( final Integer delay )
+    {
+        this.delay = delay;
+        return this;
+    }
+
+    public Integer getFixedDelay()
+    {
+        return fixedDelay;
+    }
+
+    public ScheduleParams setFixedDelay( final Integer fixedDelay )
+    {
+        this.fixedDelay = fixedDelay;
         return this;
     }
 

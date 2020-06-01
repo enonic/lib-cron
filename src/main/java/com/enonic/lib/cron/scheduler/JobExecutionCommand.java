@@ -31,13 +31,13 @@ final class JobExecutionCommand
                          final Consumer<JobExecutionCommand> finishedCallback )
     {
         this.descriptor = descriptor;
-        this.rerunCallback = rerunCallback;
         this.finishedCallback = finishedCallback;
+        this.rerunCallback = this.descriptor.getFixedDelay() == 0 ? rerunCallback : command -> {
+        };
         this.runCount = new AtomicInteger( 0 );
 
-        final boolean isEndless = descriptor.getTimes().isEmpty();
-        this.runCheckFunction =
-            isEndless ? ( JobDescriptor o ) -> true : ( JobDescriptor o ) -> this.runCount.getAndIncrement() < o.getTimes().get();
+        final boolean isEndless = descriptor.getTimes() == 0;
+        this.runCheckFunction = isEndless ? job -> true : job -> this.runCount.getAndIncrement() < job.getTimes();
     }
 
     @Override
@@ -45,14 +45,23 @@ final class JobExecutionCommand
     {
         try
         {
-            if ( !runCheckFunction.test( this.descriptor ) )
+            if ( runCheckFunction.test( this.descriptor ) )
             {
-                this.finishedCallback.accept( this );
+                try
+                {
+                    this.doRun();
+                }
+                catch ( Exception e )
+                {
+                    this.rerunCallback.accept( this );
+                    throw e;
+                }
+
+                this.rerunCallback.accept( this );
             }
             else
             {
-                this.doRun();
-                this.rerunCallback.accept( this );
+                this.finishedCallback.accept( this );
             }
         }
         catch ( Exception e )

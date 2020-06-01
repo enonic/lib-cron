@@ -1,7 +1,5 @@
 package com.enonic.lib.cron.scheduler;
 
-import java.util.Optional;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -52,19 +50,21 @@ public class JobExecutionCommandTest
     }
 
     @Test
-    public void runZeroTimes()
+    public void runWithZeroTimes()
         throws Exception
     {
         final JobDescriptor descriptor = Mockito.mock( JobDescriptor.class );
 
         final Runnable script = Mockito.mock( Runnable.class );
-        Mockito.when( descriptor.getTimes() ).thenReturn( Optional.of( 0 ) );
+        Mockito.when( descriptor.getTimes() ).thenReturn( 0 );
+        Mockito.when( descriptor.getContext() ).thenReturn( ContextAccessor.current() );
+        Mockito.when( descriptor.getScript() ).thenReturn( script );
 
         new JobExecutionCommand( descriptor, command -> {
         }, command -> {
         } ).run();
 
-        Mockito.verify( script, Mockito.times( 0 ) ).run();
+        Mockito.verify( script, Mockito.times( 1 ) ).run();
     }
 
     @Test
