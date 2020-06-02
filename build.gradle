@@ -25,12 +25,12 @@ dependencies {
     compile "com.cronutils:cron-utils:8.1.1"
     includeLib "com.cronutils:cron-utils:8.1.1"
 
-    testCompile "org.mockito:mockito-core:3.3.3"
-    testCompile "org.mockito:mockito-junit-jupiter:3.3.3"
-    testCompile 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testCompile 'org.slf4j:slf4j-log4j12:1.7.25'
-    testCompile 'org.apache.felix:org.apache.felix.framework:6.0.3'
-    testCompile 'org.ops4j.pax.tinybundles:tinybundles:3.0.0'
+    testImplementation "org.mockito:mockito-core:3.3.3"
+    testImplementation "org.mockito:mockito-junit-jupiter:3.3.3"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+    testImplementation 'org.slf4j:slf4j-log4j12:1.7.25'
+    testImplementation 'org.apache.felix:org.apache.felix.framework:6.0.3'
+    testImplementation 'org.ops4j.pax.tinybundles:tinybundles:3.0.0'
 }
 
 task copyPropertyFiles(type: Copy) {
@@ -75,3 +75,6 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
+test {
+    useJUnitPlatform()
+}
