@@ -1,13 +1,14 @@
 package com.enonic.lib.cron.handler;
 
-import com.enonic.lib.cron.provider.CronJobProvider;
 import com.enonic.lib.cron.mapper.JobDescriptorMapper;
 import com.enonic.lib.cron.mapper.JobDescriptorsMapper;
 import com.enonic.lib.cron.model.params.ListJobsParams;
 import com.enonic.lib.cron.model.params.ScheduleParams;
+import com.enonic.lib.cron.provider.CronJobProvider;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.script.bean.BeanContext;
 import com.enonic.xp.script.bean.ScriptBean;
+import com.enonic.xp.security.SecurityService;
 
 public final class LibCronHandler
     implements ScriptBean
@@ -17,8 +18,13 @@ public final class LibCronHandler
     @Override
     public void initialize( final BeanContext context )
     {
-        this.cronJobProvider = context.getService( CronJobProvider.class ).get();
-        this.cronJobProvider.setContext( context.getBinding( Context.class ).get() );
+        this.cronJobProvider = new CronJobProvider( context.getApplicationKey(), context.getBinding( Context.class ).get(),
+                                                    context.getService( SecurityService.class ).get() );
+    }
+
+    public void deactivate()
+    {
+        this.cronJobProvider.deactivate();
     }
 
     public void schedule( final ScheduleParams params )
