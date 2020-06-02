@@ -1,6 +1,7 @@
 package com.enonic.lib.cron.scheduler;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.script.ScriptEngine;
@@ -13,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.enonic.lib.cron.model.JobDescriptor;
-import com.enonic.lib.cron.model.JobDescriptors;
+import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.ContextAccessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class JobSchedulerImplTest
+public class JobSchedulerTest
     extends BundleBasedTest
 {
-    private JobSchedulerImpl scheduler;
+    private JobScheduler scheduler;
 
     private ScriptEngine engine;
 
@@ -30,8 +31,7 @@ public class JobSchedulerImplTest
         throws Exception
     {
         super.setup();
-        this.scheduler = new JobSchedulerImpl();
-        this.scheduler.setup( getBundleContext() );
+        this.scheduler = new JobScheduler( ApplicationKey.from( getBundleContext().getBundle() ) );
 
         final ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName( "nashorn" );
@@ -41,6 +41,28 @@ public class JobSchedulerImplTest
     public void deactivate()
     {
         this.scheduler.deactivate();
+    }
+
+    @Test
+    public void testEmptyList()
+        throws Exception
+    {
+        List<JobDescriptor> expected = List.of();
+
+        assertEquals( expected, this.scheduler.list( null ) );
+        assertEquals( expected, this.scheduler.list( "" ) );
+        assertEquals( expected, this.scheduler.list( ".+" ) );
+        assertEquals( expected, this.scheduler.list( "jobName\\d+" ) );
+
+        final JobDescriptor job = mockJob( "jobName1", Duration.ofMillis( 100000 ) );
+        this.scheduler.schedule( job );
+
+        expected = List.of( job );
+
+        assertEquals( expected, this.scheduler.list( null ) );
+        assertEquals( expected, this.scheduler.list( "" ) );
+        assertEquals( expected, this.scheduler.list( ".+" ) );
+        assertEquals( expected, this.scheduler.list( "jobName\\d+" ) );
     }
 
     @Test
@@ -108,11 +130,8 @@ public class JobSchedulerImplTest
         final JobDescriptor job1 = mockJob( "jobName1", Duration.ofMillis( 10 ), 3, script1 );
         final JobDescriptor job2 = mockJob( "jobName2", Duration.ofMillis( 10 ), 1, script2 );
 
-        final JobDescriptors jobs = new JobDescriptors();
-        jobs.add( job1 );
-        jobs.add( job2 );
-
-        this.scheduler.schedule( jobs );
+        this.scheduler.schedule( job1 );
+        this.scheduler.schedule( job2 );
 
         Thread.sleep( 1000 );
 

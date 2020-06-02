@@ -1,5 +1,9 @@
 var service = __.newBean('com.enonic.lib.cron.handler.LibCronHandler');
 
+__.disposer(function () {
+    service.deactivate();
+});
+
 function nullOrValue(value) {
     if (value === undefined) {
         return null;
