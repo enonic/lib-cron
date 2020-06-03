@@ -1,5 +1,8 @@
 package com.enonic.lib.cron.mapper;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.script.serializer.MapGenerator;
@@ -22,6 +25,13 @@ public final class JobDescriptorMapper
         gen.value( "cron", this.jobDescriptor.getCron() );
         gen.value( "cronDescription", this.jobDescriptor.getCronDescription() );
         gen.value( "applicationKey", this.jobDescriptor.getApplicationKey().toString() );
+
+        final Duration nextExecution = this.jobDescriptor.nextExecution();
+        if ( nextExecution != null )
+        {
+            gen.value( "nextExecTime", Instant.now().plus( nextExecution ) );
+        }
+
         serializeContext( gen, this.jobDescriptor.getContext() );
     }
 
