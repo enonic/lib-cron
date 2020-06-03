@@ -1,6 +1,5 @@
 package com.enonic.lib.cron.scheduler;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,30 +18,30 @@ public final class JobScheduler
 
     private final RecurringJobScheduler scheduler;
 
-    private final Map<JobDescriptor, RecurringJob> tasks = Collections.synchronizedMap( new LinkedHashMap<>() );
+    private final Map<JobDescriptor, RecurringJob> tasks = new LinkedHashMap<>();
 
     public JobScheduler( final ApplicationKey applicationKey )
     {
         this.scheduler = new RecurringJobScheduler( applicationKey + "-job-thread" );
     }
 
-    public void deactivate()
+    public synchronized void deactivate()
     {
         this.scheduler.shutdownNow();
         this.tasks.clear();
     }
 
-    public void unschedule( final String jobName )
+    public synchronized void unschedule( final String jobName )
     {
         doUnschedule( jobName );
     }
 
-    public void schedule( final JobDescriptor job )
+    public synchronized void schedule( final JobDescriptor job )
     {
         doSchedule( job );
     }
 
-    public JobDescriptor get( final String jobName )
+    public synchronized JobDescriptor get( final String jobName )
     {
         return this.tasks.keySet().
             stream().
@@ -51,7 +50,7 @@ public final class JobScheduler
             orElse( null );
     }
 
-    public List<JobDescriptor> list( final String jobNamePattern )
+    public synchronized List<JobDescriptor> list( final String jobNamePattern )
     {
         if ( jobNamePattern == null || jobNamePattern.isEmpty() )
         {
@@ -93,13 +92,13 @@ public final class JobScheduler
         }
     }
 
-    private void rerunCommandCallback( final JobExecutionCommand command )
+    private synchronized void rerunCommandCallback( final JobExecutionCommand command )
     {
         final RecurringJob recurringJob = this.scheduler.schedule( command );
         this.tasks.put( command.getDescriptor(), recurringJob );
     }
 
-    private void removeCommandCallback( final JobExecutionCommand command )
+    private synchronized void removeCommandCallback( final JobExecutionCommand command )
     {
         final RecurringJob job = this.tasks.remove( command.getDescriptor() );
         if ( job != null )
