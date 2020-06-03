@@ -19,8 +19,16 @@ public final class JobDescriptorMapper
     public void serialize( final MapGenerator gen )
     {
         gen.value( "name", this.jobDescriptor.getName() );
-        gen.value( "cron", this.jobDescriptor.getCron() );
-        gen.value( "cronDescription", this.jobDescriptor.getCronDescription() );
+        if ( this.jobDescriptor.getCron() != null )
+        {
+            gen.value( "cron", this.jobDescriptor.getCron() );
+            gen.value( "cronDescription", this.jobDescriptor.getCronDescription() );
+        }
+        else
+        {
+            gen.value( "fixedDelay", this.jobDescriptor.getFixedDelay() );
+            gen.value( "delay", this.jobDescriptor.getDelay() );
+        }
         gen.value( "applicationKey", this.jobDescriptor.getApplicationKey().toString() );
         serializeContext( gen, this.jobDescriptor.getContext() );
     }

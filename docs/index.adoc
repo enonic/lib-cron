@@ -34,7 +34,9 @@ The schedule function takes a parameter object with options.
 
 * `options` (_object_) Parameters to schedule a task.
 ** `*name*` (_string_) Unique task name.
-** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]).
+** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]). Can't be set with (`*fixedDelay*`/`*delay*`).
+** `*fixedDelay*` (_number_) The delay between the termination of one execution and the commencement of the next. Can't be set with (`*cron*`).
+** `*delay*` (_number_) The time to delay first execution. Can't be set with (`*cron*`).
 ** `*times*` (_number_) Number of task runs. Leave it empty for infinite calls.
 ** `*callback*` (_function_) Code of task which should be called.
 ** `*context*` (_object_) Context of the task run.
@@ -95,6 +97,8 @@ And the result is task mapper object, which contains description of run task:
 ** `*name*` (_string_) Name of a scheduled task.
 ** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]).
 ** `*cronDescription*` (_string_) Human readable description of UINX cron pattern.
+** `*fixedDelay*` (_number_) The delay between the termination of one execution and the commencement of the next.
+** `*delay*` (_number_) The time to delay first execution.
 ** `*applicationKey*` (_string_) Key of application has run the task.
 ** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
 
@@ -135,6 +139,24 @@ cron.schedule({
 <1> Callback will be run every hour.
 <2> Callback will be run 5 times.
 <3> System admin role will be used for task run.
+
+[source,js]
+----
+var cron = require('/lib/cron');
+
+cron.schedule({
+    name: 'myTask',
+    delay: 1000,<1>
+    fixedDelay: 5000,<2>
+    times: 5,<3>
+    callback: function() {
+        log.info('Task is called');
+    }
+});
+----
+<1> First callback will be run after 1000ms initial delay.
+<2> Next callbacks will be run every 5000ms.
+<3> Callbacks will be run 5 times in total.
 
 `reschedule` method is using the same list of parameters.
 
