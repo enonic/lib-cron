@@ -101,6 +101,7 @@ And the result is task mapper object, which contains description of run task:
 ** `*delay*` (_number_) The time to delay first execution.
 ** `*applicationKey*` (_string_) Key of application has run the task.
 ** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
+** `*nextExecTime*` (_string_) Provides nearest time for next execution in ISO 8601 format.
 
 To fetch a list of all scheduled tasks use `list` method:
 
