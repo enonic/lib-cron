@@ -22,11 +22,6 @@ public final class LibCronHandler
                                                     context.getService( SecurityService.class ).get() );
     }
 
-    public void deactivate()
-    {
-        this.cronJobProvider.deactivate();
-    }
-
     public void schedule( final ScheduleParams params )
     {
         cronJobProvider.schedule( params );

@@ -4,6 +4,15 @@ __.disposer(function () {
     service.deactivate();
 });
 
+function required(params, name) {
+    var value = params[name];
+    if (value === undefined) {
+        throw 'Parameter \'' + name + '\' is required';
+    }
+
+    return value;
+}
+
 function nullOrValue(value) {
     if (value === undefined) {
         return null;
@@ -17,11 +26,11 @@ function schedule(params) {
     var serviceParams = service.newParams();
     var contextParams = serviceParams.context;
 
-    serviceParams.name = nullOrValue(params.name);
+    serviceParams.name = required(params, 'name');
+    serviceParams.script = required(params, 'callback');
     serviceParams.cron = nullOrValue(params.cron);
     serviceParams.delay = nullOrValue(params.delay);
     serviceParams.fixedDelay = nullOrValue(params.fixedDelay);
-    serviceParams.script = nullOrValue(params.callback);
     serviceParams.times = nullOrValue(params.times);
 
     serviceParams.applicationKey = nullOrValue(app.name);
