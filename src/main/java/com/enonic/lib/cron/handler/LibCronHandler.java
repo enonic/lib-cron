@@ -52,4 +52,9 @@ public final class LibCronHandler
         return new ListJobsParams();
     }
 
+    public void deactivate()
+    {
+        this.cronJobProvider.deactivate();
+    }
+
 }
