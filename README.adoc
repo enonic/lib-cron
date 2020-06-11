@@ -14,6 +14,10 @@ Cron library allows you to schedule tasks and run them in background threads.
 |7.0.x
 |com.enonic.lib:lib-cron:1.0.0
 
+|1.1.0
+|7.0.x
+|com.enonic.lib:lib-cron:1.0.0
+
 |===
 
 == Getting the source
