@@ -18,6 +18,7 @@ import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.ContextAccessor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JobSchedulerTest
     extends BundleBasedTest
@@ -97,13 +98,13 @@ public class JobSchedulerTest
         throws Exception
     {
         final AtomicInteger callCount = new AtomicInteger( 0 );
-        final JobDescriptor job = mockJob( "jobName1", 150, 100, 0, callCount::incrementAndGet );
+        final JobDescriptor job = mockJob( "jobName1", 100, 100, 0, callCount::incrementAndGet );
 
         this.scheduler.schedule( job );
 
         Thread.sleep( 1000 );
 
-        assertEquals( 9, callCount.get() );
+        assertTrue(  callCount.get() >= 8 );
     }
 
     @Test
