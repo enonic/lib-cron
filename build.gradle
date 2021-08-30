@@ -24,7 +24,7 @@ dependencies {
     includeLib "com.cronutils:cron-utils:9.1.5"
 
     testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.12.2'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testImplementation 'org.slf4j:slf4j-log4j12:1.7.32'
     testImplementation 'org.apache.felix:org.apache.felix.framework:7.0.1'
