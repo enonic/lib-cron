@@ -20,8 +20,8 @@ dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
     compile "com.enonic.xp:lib-common:${xpVersion}"
 
-    compile "com.cronutils:cron-utils:9.1.6"
-    includeLib "com.cronutils:cron-utils:9.1.5"
+    compile "com.cronutils:cron-utils:9.1.7"
+    includeLib "com.cronutils:cron-utils:9.1.7"
 
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.mockito:mockito-junit-jupiter:4.6.1'
