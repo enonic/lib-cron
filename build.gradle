@@ -20,7 +20,7 @@ dependencies {
     compileOnly "com.enonic.xp:script-api:${xpVersion}"
     compile "com.enonic.xp:lib-common:${xpVersion}"
 
-    compile "com.cronutils:cron-utils:9.1.7"
+    compile "com.cronutils:cron-utils:9.2.0"
     includeLib "com.cronutils:cron-utils:9.1.7"
 
     testImplementation 'org.mockito:mockito-core:4.6.1'
