@@ -23,7 +23,7 @@ dependencies {
     implementation "com.cronutils:cron-utils:9.2.0"
     includeLib "com.cronutils:cron-utils:9.2.0"
 
-    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-core:5.13.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.slf4j:slf4j-log4j12:2.0.16'
