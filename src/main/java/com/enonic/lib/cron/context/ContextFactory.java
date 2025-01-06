@@ -39,7 +39,7 @@ public final class ContextFactory
         final ContextBuilder builder = ContextBuilder.from( this.defaultContext );
 
         applyRepository( builder, params.getRepository() );
-        applyAuthInfo( builder, params.getUsername(), params.getUserStore(), params.getPrincipals() );
+        applyAuthInfo( builder, params.getUsername(), params.getIdProvider(), params.getPrincipals() );
         applyBranch( builder, params.getBranch() );
         addAttributes( builder, params.getAttributes() );
 
@@ -55,13 +55,13 @@ public final class ContextFactory
         builder.repositoryId( repository );
     }
 
-    private void applyAuthInfo( final ContextBuilder builder, final String username, final String userStore,
+    private void applyAuthInfo( final ContextBuilder builder, final String username, final String idProvider,
                                 final PrincipalKey[] principals )
     {
         AuthenticationInfo authInfo = this.defaultContext.getAuthInfo();
         if ( username != null )
         {
-            authInfo = runAsAuthenticated( () -> getAuthenticationInfo( username, userStore ) );
+            authInfo = runAsAuthenticated( () -> getAuthenticationInfo( username, idProvider ) );
         }
         if ( principals != null )
         {

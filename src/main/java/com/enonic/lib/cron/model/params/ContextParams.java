@@ -13,7 +13,7 @@ public final class ContextParams
 
     protected String username;
 
-    protected String userStore;
+    protected String idProvider;
 
     protected PrincipalKey[] principals;
 
@@ -34,9 +34,9 @@ public final class ContextParams
         this.username = username;
     }
 
-    public void setUserStore( final String userStore )
+    public void setIdProvider( final String idProvider )
     {
-        this.userStore = userStore;
+        this.idProvider = idProvider;
     }
 
     public void setPrincipals( final String[] principals )
@@ -75,9 +75,9 @@ public final class ContextParams
         return username;
     }
 
-    public String getUserStore()
+    public String getIdProvider()
     {
-        return userStore;
+        return idProvider;
     }
 
     public PrincipalKey[] getPrincipals()

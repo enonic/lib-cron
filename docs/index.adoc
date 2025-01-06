@@ -46,7 +46,8 @@ The schedule function takes a parameter object with options.
 *** `*attributes*` (_object_) Map of context attributes.
 *** `*user*` (_object_) User credentials.
 **** `*login*` (_string_) User login.
-**** `*userStore*` (_string_) Name of userStore.
+**** `*userStore*` (_string_) Deprecated. Use idProvider instead.
+**** `*idProvider*` (_string_) Name of idProvider.
 
 === `Unschedule`
 

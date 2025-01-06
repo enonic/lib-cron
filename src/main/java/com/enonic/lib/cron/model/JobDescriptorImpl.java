@@ -98,7 +98,7 @@ final class JobDescriptorImpl
         }
         else
         {
-            return this.name + " @ " + " delay: " + delay + "ms, fixedDelay: " + this.fixedDelay + "ms";
+            return this.name + " @ " + " delay: " + this.delay + "ms, fixedDelay: " + this.fixedDelay + "ms";
         }
     }
 

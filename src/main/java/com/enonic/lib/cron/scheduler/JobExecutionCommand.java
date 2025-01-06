@@ -1,7 +1,6 @@
 package com.enonic.lib.cron.scheduler;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -15,29 +14,20 @@ import com.enonic.lib.cron.model.JobDescriptor;
 final class JobExecutionCommand
     implements Runnable
 {
-    private final static Logger LOG = LoggerFactory.getLogger( JobExecutionCommand.class );
+    private static final Logger LOG = LoggerFactory.getLogger( JobExecutionCommand.class );
 
     private final JobDescriptor descriptor;
 
-    private final AtomicInteger runCount;
-
     private final Consumer<JobExecutionCommand> rerunCallback;
 
-    private final Consumer<JobExecutionCommand> finishedCallback;
-
-    private final Predicate<JobDescriptor> runCheckFunction;
+    private final Predicate<JobExecutionCommand> runCheckFunction;
 
     JobExecutionCommand( final JobDescriptor descriptor, final Consumer<JobExecutionCommand> rerunCallback,
-                         final Consumer<JobExecutionCommand> finishedCallback )
+                         final Predicate<JobExecutionCommand> runCheckFunction )
     {
         this.descriptor = descriptor;
-        this.finishedCallback = finishedCallback;
-        this.rerunCallback = this.descriptor.getFixedDelay() == 0 ? rerunCallback : command -> {
-        };
-        this.runCount = new AtomicInteger( 0 );
-
-        final boolean isEndless = descriptor.getTimes() == 0;
-        this.runCheckFunction = isEndless ? job -> true : job -> this.runCount.getAndIncrement() < job.getTimes();
+        this.rerunCallback = rerunCallback;
+        this.runCheckFunction = runCheckFunction;
     }
 
     @Override
@@ -45,7 +35,7 @@ final class JobExecutionCommand
     {
         try
         {
-            if ( runCheckFunction.test( this.descriptor ) )
+            if ( runCheckFunction.test( this ) )
             {
                 try
                 {
@@ -58,10 +48,6 @@ final class JobExecutionCommand
                 }
 
                 this.rerunCallback.accept( this );
-            }
-            else
-            {
-                this.finishedCallback.accept( this );
             }
         }
         catch ( Exception e )

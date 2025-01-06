@@ -28,12 +28,6 @@ public class CronJobProvider
     public void schedule( final ScheduleParams params )
     {
         final JobDescriptor jobDescriptor = jobDescriptorFactory.create( params );
-
-        if ( jobDescriptor == null )
-        {
-            throw new RuntimeException( String.format( "Cannot create a job 'name: %s, cron:%s'", params.getName(), params.getCron() ) );
-        }
-
         jobScheduler.schedule( jobDescriptor );
     }
 
@@ -50,7 +44,6 @@ public class CronJobProvider
     public JobDescriptorMapper get( final String jobName )
     {
         final JobDescriptor jobDescriptor = this.jobScheduler.get( jobName );
-
         return jobDescriptor != null ? new JobDescriptorMapper( jobDescriptor ) : null;
     }
 
@@ -59,5 +52,4 @@ public class CronJobProvider
         final List<JobDescriptor> jobDescriptors = this.jobScheduler.list( params.getPattern() );
         return new JobDescriptorsMapper( jobDescriptors );
     }
-
 }

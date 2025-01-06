@@ -15,11 +15,11 @@ import com.cronutils.parser.CronParser;
 
 final class CronTrigger
 {
-    private final static CronDefinition DEFINITION = CronDefinitionBuilder.instanceDefinitionFor( CronType.UNIX );
+    private static final CronDefinition DEFINITION = CronDefinitionBuilder.instanceDefinitionFor( CronType.UNIX );
 
-    private final static CronParser PARSER = new CronParser( DEFINITION );
+    private static final CronParser PARSER = new CronParser( DEFINITION );
 
-    private final static CronDescriptor DESCRIPTOR =
+    private static final CronDescriptor DESCRIPTOR =
         new CronDescriptor( ResourceBundle.getBundle( "properties/CronUtilsI18N", Locale.UK ) );
 
     private final Cron cron;

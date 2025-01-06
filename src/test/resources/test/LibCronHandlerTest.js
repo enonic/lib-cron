@@ -99,10 +99,9 @@ exports.scheduleWithContext = function () {
         }, context: {
             branch: 'master',
             repository: 'my-repo',
-            principals: ['role:system.admin'],
             user: {
                 login: 'test-user',
-                userStore: 'system'
+                idProvider: 'system'
             },
             principals: [
                 'user:system:test-user',
@@ -201,4 +200,3 @@ exports.list = function () {
 
     assert.assertJsonEquals(listExpected, result);
 };
-

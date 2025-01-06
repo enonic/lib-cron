@@ -231,6 +231,7 @@ public class JobSchedulerTest
     private JobDescriptor mockJob( final String jobName, final Duration nextExec, final int times, final Runnable script )
     {
         final JobDescriptor job = Mockito.mock( JobDescriptor.class );
+        Mockito.when( job.getCron() ).thenReturn( "* * * * *" );
         Mockito.when( job.nextExecution() ).thenReturn( nextExec );
         Mockito.when( job.getName() ).thenReturn( jobName );
         Mockito.when( job.getTimes() ).thenReturn( times );
