@@ -20,7 +20,7 @@ public final class JobDescriptorsMapper
     public void serialize( final MapGenerator gen )
     {
         gen.array( "jobs" );
-        if ( jobDescriptors != null && jobDescriptors.size() > 0 )
+        if ( jobDescriptors != null && !jobDescriptors.isEmpty() )
         {
             jobDescriptors.forEach( jobDescriptor -> {
                 gen.map();
@@ -29,6 +29,5 @@ public final class JobDescriptorsMapper
             } );
         }
         gen.end();
-
     }
 }

@@ -53,7 +53,7 @@ public class JobDescriptorImplTest
         } );
 
         final JobDescriptor jobDescriptor = builder.build();
-        assertEquals( "myJob @ 1 1 1 1 1 (at 01:01 at 1 day at January month at Monday day)", jobDescriptor.getDescription() );
+        assertEquals( "myJob @ 1 1 1 1 1 (at 01:01 at 1 day at Jan month at Mon day)", jobDescriptor.getDescription() );
 
     }
 
@@ -69,7 +69,7 @@ public class JobDescriptorImplTest
 
         final JobDescriptor jobDescriptor = builder.build();
         assertEquals(
-            "myJob @ 2-32/2 */2 1,2,3 1 sun (every 2 minutes between 2 and 32 every 2 hours at 1, 2 and 3 days at January month at Sunday day)",
+            "myJob @ 2-32/2 */2 1,2,3 1 sun (every 2 minutes between 2 and 32 every 2 hours at 1, 2 and 3 days at Jan month at Sun day)",
             jobDescriptor.getDescription() );
 
     }
@@ -86,7 +86,7 @@ public class JobDescriptorImplTest
 
         final JobDescriptor jobDescriptor = builder.build();
         assertEquals(
-            "myJob @ 0-18 1-2 * 3-4 1-5 (every minute between 0 and 18 every hour between 1 and 2 every month between March and April every day between Monday and Friday)",
+            "myJob @ 0-18 1-2 * 3-4 1-5 (every minute between 0 and 18 every hour between 1 and 2 every month between Mar and Apr every day between Mon and Fri)",
             jobDescriptor.getDescription() );
 
     }

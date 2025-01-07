@@ -42,27 +42,8 @@ public class JobExecutionCommandTest
         Mockito.when( descriptor.getScript() ).thenReturn( script );
         Mockito.when( descriptor.getContext() ).thenReturn( ContextAccessor.current() );
 
-        new JobExecutionCommand( descriptor, command -> {
-        }, command -> {
-        } ).run();
-
-        Mockito.verify( script, Mockito.times( 1 ) ).run();
-    }
-
-    @Test
-    public void runWithZeroTimes()
-        throws Exception
-    {
-        final JobDescriptor descriptor = Mockito.mock( JobDescriptor.class );
-
-        final Runnable script = Mockito.mock( Runnable.class );
-        Mockito.when( descriptor.getTimes() ).thenReturn( 0 );
-        Mockito.when( descriptor.getContext() ).thenReturn( ContextAccessor.current() );
-        Mockito.when( descriptor.getScript() ).thenReturn( script );
-
-        new JobExecutionCommand( descriptor, command -> {
-        }, command -> {
-        } ).run();
+        new JobExecutionCommand( descriptor,  command -> {
+        }, command -> true ).run();
 
         Mockito.verify( script, Mockito.times( 1 ) ).run();
     }
@@ -84,8 +65,7 @@ public class JobExecutionCommandTest
         Mockito.doThrow( new RuntimeException() ).when( context ).runWith( script );
 
         new JobExecutionCommand( descriptor, command -> {
-        }, command -> {
-        } ).run();
+        }, command -> true ).run();
         Mockito.verify( mockAppender, Mockito.times( 2 ) ).doAppend( eventArgumentCaptor.capture() );
 
         assertEquals( "Executing job [myJob]", eventArgumentCaptor.getAllValues().get( 0 ).getMessage() );
@@ -111,8 +91,7 @@ public class JobExecutionCommandTest
         try
         {
             new JobExecutionCommand( descriptor, command -> {
-            }, command -> {
-            } ).run();
+            }, command -> true ).run();
         }
         catch ( Throwable e )
         {

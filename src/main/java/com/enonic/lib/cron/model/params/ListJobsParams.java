@@ -2,11 +2,7 @@ package com.enonic.lib.cron.model.params;
 
 public class ListJobsParams
 {
-    protected String pattern;
-
-    public ListJobsParams()
-    {
-    }
+    private String pattern;
 
     public String getPattern()
     {

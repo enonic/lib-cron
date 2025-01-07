@@ -8,8 +8,8 @@ import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptorFactory;
 import com.enonic.lib.cron.model.params.ListJobsParams;
 import com.enonic.lib.cron.model.params.ScheduleParams;
+import com.enonic.lib.cron.scheduler.JobExecutorService;
 import com.enonic.lib.cron.scheduler.JobScheduler;
-import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.security.SecurityService;
 
@@ -19,21 +19,15 @@ public class CronJobProvider
 
     private final JobScheduler jobScheduler;
 
-    public CronJobProvider( final ApplicationKey applicationKey, final Context context, final SecurityService securityService )
+    public CronJobProvider( final Context context, final SecurityService securityService, final JobExecutorService jobExecutorService )
     {
         this.jobDescriptorFactory = new JobDescriptorFactory( securityService, context );
-        this.jobScheduler = new JobScheduler( applicationKey );
+        this.jobScheduler = new JobScheduler( jobExecutorService );
     }
 
     public void schedule( final ScheduleParams params )
     {
         final JobDescriptor jobDescriptor = jobDescriptorFactory.create( params );
-
-        if ( jobDescriptor == null )
-        {
-            throw new RuntimeException( String.format( "Cannot create a job 'name: %s, cron:%s'", params.getName(), params.getCron() ) );
-        }
-
         jobScheduler.schedule( jobDescriptor );
     }
 
@@ -50,7 +44,6 @@ public class CronJobProvider
     public JobDescriptorMapper get( final String jobName )
     {
         final JobDescriptor jobDescriptor = this.jobScheduler.get( jobName );
-
         return jobDescriptor != null ? new JobDescriptorMapper( jobDescriptor ) : null;
     }
 
@@ -59,5 +52,4 @@ public class CronJobProvider
         final List<JobDescriptor> jobDescriptors = this.jobScheduler.list( params.getPattern() );
         return new JobDescriptorsMapper( jobDescriptors );
     }
-
 }

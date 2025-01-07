@@ -1,11 +1,7 @@
-var service = __.newBean('com.enonic.lib.cron.handler.LibCronHandler');
-
-__.disposer(function () {
-    service.deactivate();
-});
+const service = __.newBean('com.enonic.lib.cron.handler.LibCronHandler');
 
 function required(params, name) {
-    var value = params[name];
+    const value = params[name];
     if (value === undefined) {
         throw 'Parameter \'' + name + '\' is required';
     }
@@ -23,43 +19,45 @@ function nullOrValue(value) {
 
 function schedule(params) {
 
-    var serviceParams = service.newParams();
-    var contextParams = serviceParams.context;
+    const serviceParams = service.newParams();
+    const contextParams = serviceParams.getContext();
 
-    serviceParams.name = required(params, 'name');
-    serviceParams.script = required(params, 'callback');
-    serviceParams.cron = nullOrValue(params.cron);
-    serviceParams.delay = nullOrValue(params.delay);
-    serviceParams.fixedDelay = nullOrValue(params.fixedDelay);
-    serviceParams.times = nullOrValue(params.times);
+    serviceParams.setName(required(params, 'name'));
+    serviceParams.setScript(required(params, 'callback'));
+    serviceParams.setCron(nullOrValue(params.cron));
+    serviceParams.setDelay(nullOrValue(params.delay));
+    serviceParams.setFixedDelay(nullOrValue(params.fixedDelay));
+    serviceParams.setTimes(nullOrValue(params.times));
 
-    serviceParams.applicationKey = nullOrValue(app.name);
+    serviceParams.setApplicationKey(nullOrValue(app.name));
 
-    var context = params.context;
+    const context = params.context;
 
     if (context) {
         if (context.repository) {
-            contextParams.repository = context.repository;
+            contextParams.setRepository(context.repository);
         }
 
         if (context.branch) {
-            contextParams.branch = context.branch;
+            contextParams.setBranch(context.branch);
         }
 
         if (context.user) {
             if (context.user.login) {
-                contextParams.username = context.user.login;
+                contextParams.setUsername(context.user.login);
             }
-            if (context.user.userStore) {
-                contextParams.userStore = context.user.userStore;
+            if (context.user.idProvider) {
+                contextParams.setIdProvider(context.user.userStore);
+            } else if (context.user.userStore) {
+                contextParams.setIdProvider(context.user.userStore);
             }
         }
 
         if (context.principals) {
-            contextParams.principals = context.principals;
+            contextParams.setPrincipals(context.principals);
         }
         if (context.attributes) {
-            contextParams.attributes = __.toScriptValue(context.attributes);
+            contextParams.setAttributes(__.toScriptValue(context.attributes));
         }
     }
 
@@ -77,20 +75,20 @@ function reschedule(params) {
 }
 
 function get(params) {
-    var result = service.get(params.name);
+    const result = service.get(params.name);
     return __.toNativeObject(result);
 }
 
 function list(params) {
-    var listParams = service.listParams();
+    const listParams = service.listParams();
 
     if(params) {
         if (params.pattern) {
-            listParams.pattern = params.pattern;
+            listParams.setPattern(params.pattern);
         }
     }
 
-    var result = service.list(listParams);
+    const result = service.list(listParams);
 
     return __.toNativeObject(result);
 }
