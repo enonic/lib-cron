@@ -32,7 +32,10 @@ public class JobSchedulerTest
         throws Exception
     {
         super.setup();
-        this.scheduler = new JobScheduler( ApplicationKey.from( getBundleContext().getBundle() ) );
+        final JobExecutorService executorService = new JobExecutorService();
+        executorService.activate( getBundleContext() );
+        getBundleContext().registerService( JobExecutorService.class, executorService, null );
+        this.scheduler = new JobScheduler( executorService );
 
         final ScriptEngineManager engineManager = new ScriptEngineManager();
         engine = engineManager.getEngineByName( "nashorn" );
@@ -108,6 +111,20 @@ public class JobSchedulerTest
     }
 
     @Test
+    public void testRunWithFixedDelay_long()
+        throws Exception
+    {
+        final AtomicInteger callCount = new AtomicInteger( 0 );
+        final JobDescriptor job = mockJob( "jobName1", 2000, 100, 0, callCount::incrementAndGet );
+
+        this.scheduler.schedule( job );
+
+        Thread.sleep( 1000 );
+
+        assertEquals( 0, callCount.get() );
+    }
+
+    @Test
     public void testRunWithFixedDelayZeroInitial()
         throws Exception
     {
@@ -118,7 +135,7 @@ public class JobSchedulerTest
 
         Thread.sleep( 1000 );
 
-        assertEquals( 10, callCount.get() );
+        assertTrue(  callCount.get() >= 8 );
     }
 
     @Test

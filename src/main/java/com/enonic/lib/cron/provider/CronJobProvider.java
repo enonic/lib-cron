@@ -8,8 +8,8 @@ import com.enonic.lib.cron.model.JobDescriptor;
 import com.enonic.lib.cron.model.JobDescriptorFactory;
 import com.enonic.lib.cron.model.params.ListJobsParams;
 import com.enonic.lib.cron.model.params.ScheduleParams;
+import com.enonic.lib.cron.scheduler.JobExecutorService;
 import com.enonic.lib.cron.scheduler.JobScheduler;
-import com.enonic.xp.app.ApplicationKey;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.security.SecurityService;
 
@@ -19,10 +19,10 @@ public class CronJobProvider
 
     private final JobScheduler jobScheduler;
 
-    public CronJobProvider( final ApplicationKey applicationKey, final Context context, final SecurityService securityService )
+    public CronJobProvider( final Context context, final SecurityService securityService, final JobExecutorService jobExecutorService )
     {
         this.jobDescriptorFactory = new JobDescriptorFactory( securityService, context );
-        this.jobScheduler = new JobScheduler( applicationKey );
+        this.jobScheduler = new JobScheduler( jobExecutorService );
     }
 
     public void schedule( final ScheduleParams params )

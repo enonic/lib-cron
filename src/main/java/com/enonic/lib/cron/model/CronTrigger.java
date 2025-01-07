@@ -20,7 +20,7 @@ final class CronTrigger
     private static final CronParser PARSER = new CronParser( DEFINITION );
 
     private static final CronDescriptor DESCRIPTOR =
-        new CronDescriptor( ResourceBundle.getBundle( "properties/CronUtilsI18N", Locale.UK ) );
+        new CronDescriptor( ResourceBundle.getBundle( "com/cronutils/CronUtilsI18N", Locale.ROOT ) );
 
     private final Cron cron;
 

@@ -12,6 +12,9 @@ repositories {
     xp.enonicRepo()
 }
 
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = sourceCompatibility
+
 configurations {
     includeLib { transitive = false }
 }
@@ -32,38 +35,23 @@ dependencies {
     testImplementation "com.enonic.xp:testing:${xpVersion}"
 }
 
-task copyPropertyFiles(type: Copy) {
-    def libFile = file(configurations.includeLib.singleFile)
-    def libFiles = zipTree(libFile)
-
-    def propertySpec = copySpec {
-        from libFiles
-        include "CronUtilsI18N*.properties"
-
-    }
-
-    into "${buildDir}/resources/main/properties" with propertySpec
-
-}
-
-task copyClassFiles(type: Copy) {
+task copyLibFiles(type: Copy) {
     def libFile = file(configurations.includeLib.singleFile)
     def libFiles = zipTree(libFile)
 
     def classSpec = copySpec {
         from libFiles
-        include "**/*.class"
+        include "**/*.**"
+        exclude "META-INF/**"
     }
 
     into "${buildDir}/classes/java/main" with classSpec
 }
 
 jar {
-    from 'CronUtilsI18N_*.properties'
-    from '*.class'
 }
 
-processResources.dependsOn copyPropertyFiles, copyClassFiles
+processResources.dependsOn copyLibFiles
 
 jacocoTestReport {
     reports {

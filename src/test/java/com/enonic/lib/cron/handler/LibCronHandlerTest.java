@@ -2,14 +2,21 @@ package com.enonic.lib.cron.handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import com.enonic.lib.cron.scheduler.JobExecutorService;
 import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.security.User;
 import com.enonic.xp.security.auth.AuthenticationInfo;
 import com.enonic.xp.security.auth.AuthenticationToken;
 import com.enonic.xp.testing.ScriptTestSupport;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LibCronHandlerTest
     extends ScriptTestSupport
@@ -22,8 +29,14 @@ public class LibCronHandlerTest
     {
         super.initialize();
 
-        this.securityService = Mockito.mock( SecurityService.class );
+        this.securityService = mock( SecurityService.class );
         addService( SecurityService.class, this.securityService );
+
+        JobExecutorService jobExecutorService = mock( JobExecutorService.class );
+
+        when( jobExecutorService.scheduleWithFixedDelay( any(), anyLong(), anyLong(), any() ) ).thenReturn( mock() );
+        when( jobExecutorService.schedule( any(), anyLong(), any() ) ).thenReturn( mock() );
+        addService( JobExecutorService.class, jobExecutorService );
     }
 
     @Test
@@ -41,7 +54,7 @@ public class LibCronHandlerTest
     @Test
     public void testScheduleWithContext()
     {
-        Mockito.when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).
+        when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).
             thenReturn( AuthenticationInfo.create().
                 user( User.create().
                     login( "test-user" ).

@@ -3,8 +3,6 @@ package com.enonic.lib.cron.scheduler;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,26 +14,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enonic.lib.cron.model.JobDescriptor;
-import com.enonic.xp.app.ApplicationKey;
 
 public final class JobScheduler
 {
     private static final Logger LOG = LoggerFactory.getLogger( JobScheduler.class );
 
-    private final ScheduledExecutorService scheduledExecutorService;
+    private final JobExecutorService jobExecutorService;
 
     private final Map<String, RecurringJob> tasks = new LinkedHashMap<>();
 
-    public JobScheduler( final ApplicationKey applicationKey )
+    public JobScheduler( final JobExecutorService executorService )
     {
-        this.scheduledExecutorService =
-            Executors.newSingleThreadScheduledExecutor( new ThreadFactoryImpl( applicationKey + "-job-thread" ) );
+        this.jobExecutorService = executorService;
     }
 
     public synchronized void deactivate()
     {
         this.tasks.clear();
-        this.scheduledExecutorService.shutdownNow();
     }
 
     public synchronized void unschedule( final String jobName )
@@ -60,8 +55,8 @@ public final class JobScheduler
         final JobExecutionCommand command = new JobExecutionCommand( job, rerunCommandCallback, runCheckFunction );
 
         final ScheduledFuture<?> scheduledFuture = cron
-            ? this.scheduledExecutorService.schedule( command, job.nextExecution().toMillis(), TimeUnit.MILLISECONDS )
-            : this.scheduledExecutorService.scheduleWithFixedDelay( command, job.getDelay(), job.getFixedDelay(), TimeUnit.MILLISECONDS );
+            ? this.jobExecutorService.schedule( command, job.nextExecution().toMillis(), TimeUnit.MILLISECONDS )
+            : this.jobExecutorService.scheduleWithFixedDelay( command, job.getDelay(), job.getFixedDelay(), TimeUnit.MILLISECONDS );
 
         final RecurringJob existed = this.tasks.put( job.getName(), new RecurringJob( scheduledFuture, job ) );
         if ( existed != null )
@@ -120,7 +115,7 @@ public final class JobScheduler
             {
                 // Our job is still in the map, so we can reschedule it
                 final ScheduledFuture<?> scheduledFuture =
-                    this.scheduledExecutorService.schedule( command, descriptor.nextExecution().toMillis(), TimeUnit.MILLISECONDS );
+                    this.jobExecutorService.schedule( command, descriptor.nextExecution().toMillis(), TimeUnit.MILLISECONDS );
                 return new RecurringJob( scheduledFuture, descriptor );
             }
             else
