@@ -5,6 +5,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -18,8 +19,9 @@ public class JobExecutorService
     @Activate
     public void activate( final BundleContext context )
     {
-        final String applicationKey = context.getBundle().getSymbolicName();
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor( new ThreadFactoryImpl( applicationKey + "-job-thread" ) );
+        final Bundle bundle = context.getBundle();
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
+            new ThreadFactoryImpl( bundle.getSymbolicName() + "-" + bundle.getBundleId() + "-job-thread-%d" ) );
     }
 
     @Deactivate
