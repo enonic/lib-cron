@@ -47,7 +47,7 @@ function schedule(params) {
                 contextParams.setUsername(context.user.login);
             }
             if (context.user.idProvider) {
-                contextParams.setIdProvider(context.user.userStore);
+                contextParams.setIdProvider(context.user.idProvider);
             } else if (context.user.userStore) {
                 contextParams.setIdProvider(context.user.userStore);
             }
