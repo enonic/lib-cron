@@ -79,15 +79,43 @@ var expectedWithContextJson = {
                 type: 'user',
                 key: 'user:system:test-user',
                 disabled: false,
+                email: 'test-user@example.no',
                 login: 'test-user',
                 idProvider: 'system'
             },
             principals: [
+                'role:system.authenticated',
+                'role:system.everyone',
                 'user:system:test-user',
                 'role:system.test-role'
             ]
         }
     }
+};
+
+exports.scheduleWithContextLegacy = function () {
+    cronLib.schedule({
+        name: 'myTask',
+        cron: '* * * * *',
+        callback: function () {
+            log.info('Task is called');
+        }, context: {
+            branch: 'master',
+            repository: 'my-repo',
+            user: {
+                login: 'test-user',
+                userStore: 'system'
+            },
+            principals: [
+                'role:system.test-role'
+            ]
+        }
+    });
+
+    var result = cronLib.get({name: 'myTask'});
+    delete result['nextExecTime'];
+
+    assert.assertJsonEquals(expectedWithContextJson, result);
 };
 
 exports.scheduleWithContext = function () {
@@ -104,7 +132,6 @@ exports.scheduleWithContext = function () {
                 idProvider: 'system'
             },
             principals: [
-                'user:system:test-user',
                 'role:system.test-role'
             ]
         }

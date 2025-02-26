@@ -2,10 +2,11 @@ package com.enonic.lib.cron.handler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.enonic.lib.cron.scheduler.JobExecutorService;
+import com.enonic.xp.security.IdProviderKey;
 import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.SecurityService;
 import com.enonic.xp.security.User;
@@ -13,9 +14,11 @@ import com.enonic.xp.security.auth.AuthenticationInfo;
 import com.enonic.xp.security.auth.AuthenticationToken;
 import com.enonic.xp.testing.ScriptTestSupport;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class LibCronHandlerTest
@@ -54,15 +57,43 @@ public class LibCronHandlerTest
     @Test
     public void testScheduleWithContext()
     {
-        when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).
-            thenReturn( AuthenticationInfo.create().
-                user( User.create().
-                    login( "test-user" ).
-                    key( PrincipalKey.from( "user:system:test-user" ) ).
-                    build() ).
-                build() );
+        final AuthenticationInfo authUser = AuthenticationInfo.create()
+            .user( User.create()
+                       .login( "test-user" )
+                       .email( "test-user@example.no" )
+                       .key( PrincipalKey.from( "user:system:test-user" ) )
+                       .build() )
+            .principals( PrincipalKey.from( "role:system.authenticated" ), PrincipalKey.from( "role:system.everyone" ) )
+            .build();
+
+        when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).thenReturn( authUser );
 
         runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContext" );
+
+        final ArgumentCaptor<AuthenticationToken> captor = ArgumentCaptor.forClass( AuthenticationToken.class );
+        verify( this.securityService ).authenticate( captor.capture() );
+        assertEquals( IdProviderKey.from( "system" ), captor.getValue().getIdProvider());
+    }
+
+    @Test
+    public void scheduleWithContextLegacy()
+    {
+        final AuthenticationInfo authUser = AuthenticationInfo.create()
+            .user( User.create()
+                       .login( "test-user" )
+                       .email( "test-user@example.no" )
+                       .key( PrincipalKey.from( "user:system:test-user" ) )
+                       .build() )
+            .principals( PrincipalKey.from( "role:system.authenticated" ), PrincipalKey.from( "role:system.everyone" ) )
+            .build();
+
+        when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).thenReturn( authUser );
+
+        runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContextLegacy" );
+
+        final ArgumentCaptor<AuthenticationToken> captor = ArgumentCaptor.forClass( AuthenticationToken.class );
+        verify( this.securityService ).authenticate( captor.capture() );
+        assertEquals( IdProviderKey.from( "system" ), captor.getValue().getIdProvider());
     }
 
     @Test
