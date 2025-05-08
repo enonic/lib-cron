@@ -81,7 +81,8 @@ var expectedWithContextJson = {
                 disabled: false,
                 email: 'test-user@example.no',
                 login: 'test-user',
-                idProvider: 'system'
+                idProvider: 'system',
+                hasPassword: false,
             },
             principals: [
                 'role:system.authenticated',
