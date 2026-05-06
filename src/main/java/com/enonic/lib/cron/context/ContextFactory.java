@@ -12,6 +12,7 @@ import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.RoleKeys;
 import com.enonic.xp.security.SecurityConstants;
 import com.enonic.xp.security.SecurityService;
+import com.enonic.xp.security.SystemConstants;
 import com.enonic.xp.security.User;
 import com.enonic.xp.security.auth.AuthenticationInfo;
 import com.enonic.xp.security.auth.VerifiedUsernameAuthToken;
@@ -97,18 +98,17 @@ public final class ContextFactory
 
     private AuthenticationInfo getAuthenticationInfo( final String username, final String idProvider )
     {
-        final VerifiedUsernameAuthToken token = new VerifiedUsernameAuthToken();
-        token.setUsername( username );
-        token.setIdProvider( idProvider == null ? null : IdProviderKey.from( idProvider ) );
+        final IdProviderKey idProviderKey = idProvider == null ? null : IdProviderKey.from( idProvider );
+        final VerifiedUsernameAuthToken token = new VerifiedUsernameAuthToken( idProviderKey, username );
         return this.securityService.authenticate( token );
     }
 
     private <T> T runAsAuthenticated( final Callable<T> runnable )
     {
-        final AuthenticationInfo authInfo = AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.ANONYMOUS ).build();
+        final AuthenticationInfo authInfo = AuthenticationInfo.create().principals( RoleKeys.AUTHENTICATED ).user( User.anonymous() ).build();
         return ContextBuilder.from( this.defaultContext ).
             authInfo( authInfo ).
-            repositoryId( SecurityConstants.SECURITY_REPO.getId() ).
+            repositoryId( SystemConstants.SYSTEM_REPO_ID ).
             branch( SecurityConstants.BRANCH_SECURITY ).build().
             callWith( runnable );
     }

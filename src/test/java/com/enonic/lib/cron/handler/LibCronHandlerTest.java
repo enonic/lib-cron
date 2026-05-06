@@ -6,6 +6,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.enonic.lib.cron.scheduler.JobExecutorService;
+import com.enonic.xp.branch.Branch;
+import com.enonic.xp.context.Context;
+import com.enonic.xp.context.ContextBuilder;
+import com.enonic.xp.repository.RepositoryId;
 import com.enonic.xp.security.IdProviderKey;
 import com.enonic.xp.security.PrincipalKey;
 import com.enonic.xp.security.SecurityService;
@@ -26,6 +30,8 @@ public class LibCronHandlerTest
 {
     private SecurityService securityService;
 
+    private Context defaultContext;
+
     @BeforeEach
     public void initialize()
         throws Exception
@@ -40,18 +46,24 @@ public class LibCronHandlerTest
         when( jobExecutorService.scheduleWithFixedDelay( any(), anyLong(), anyLong(), any() ) ).thenReturn( mock() );
         when( jobExecutorService.schedule( any(), anyLong(), any() ) ).thenReturn( mock() );
         addService( JobExecutorService.class, jobExecutorService );
+
+        this.defaultContext = ContextBuilder.create()
+            .branch( Branch.from( "draft" ) )
+            .repositoryId( RepositoryId.from( "com.enonic.cms.default" ) )
+            .authInfo( AuthenticationInfo.unAuthenticated() )
+            .build();
     }
 
     @Test
     public void testScheduleWithDelay()
     {
-        runFunction( "/test/LibCronHandlerTest.js", "scheduleWithDelay" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "scheduleWithDelay" ) );
     }
 
     @Test
     public void testScheduleWithCron()
     {
-        runFunction( "/test/LibCronHandlerTest.js", "scheduleWithCron" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "scheduleWithCron" ) );
     }
 
     @Test
@@ -68,7 +80,7 @@ public class LibCronHandlerTest
 
         when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).thenReturn( authUser );
 
-        runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContext" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContext" ) );
 
         final ArgumentCaptor<AuthenticationToken> captor = ArgumentCaptor.forClass( AuthenticationToken.class );
         verify( this.securityService ).authenticate( captor.capture() );
@@ -89,7 +101,7 @@ public class LibCronHandlerTest
 
         when( this.securityService.authenticate( Mockito.isA( AuthenticationToken.class ) ) ).thenReturn( authUser );
 
-        runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContextLegacy" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "scheduleWithContextLegacy" ) );
 
         final ArgumentCaptor<AuthenticationToken> captor = ArgumentCaptor.forClass( AuthenticationToken.class );
         verify( this.securityService ).authenticate( captor.capture() );
@@ -99,12 +111,12 @@ public class LibCronHandlerTest
     @Test
     public void testUnschedule()
     {
-        runFunction( "/test/LibCronHandlerTest.js", "unschedule" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "unschedule" ) );
     }
 
     @Test
     public void testList()
     {
-        runFunction( "/test/LibCronHandlerTest.js", "list" );
+        defaultContext.runWith( () -> runFunction( "/test/LibCronHandlerTest.js", "list" ) );
     }
 }

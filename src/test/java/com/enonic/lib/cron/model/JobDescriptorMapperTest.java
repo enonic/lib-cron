@@ -13,8 +13,10 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.enonic.lib.cron.mapper.JobDescriptorMapper;
-import com.enonic.xp.context.ContextAccessor;
-import com.enonic.xp.script.serializer.JsonMapGenerator;
+import com.enonic.xp.branch.Branch;
+import com.enonic.xp.context.ContextBuilder;
+import com.enonic.xp.repository.RepositoryId;
+import com.enonic.xp.testing.serializer.JsonMapGenerator;
 
 public class JobDescriptorMapperTest
 {
@@ -26,7 +28,10 @@ public class JobDescriptorMapperTest
             name( "myJob" ).
             cron( "* * * * *" ).
             applicationKey( "appKey" ).
-            context( ContextAccessor.current() );
+            context( ContextBuilder.create()
+                         .branch( Branch.from( "draft" ) )
+                         .repositoryId( RepositoryId.from( "com.enonic.cms.default" ) )
+                         .build() );
 
         final ScriptEngine engine = new ScriptEngineManager().getEngineByName( "nashorn" );
         builder.script( () -> {

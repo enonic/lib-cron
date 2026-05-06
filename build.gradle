@@ -3,7 +3,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'com.enonic.defaults' version '2.1.6'
-    id 'com.enonic.xp.base' version '3.6.2'
+    id 'com.enonic.xp.base'
 }
 
 repositories {
@@ -12,23 +12,19 @@ repositories {
     xp.enonicRepo()
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
-}
-
 configurations {
     includeLib { transitive = false }
 }
 
 dependencies {
-    compileOnly "com.enonic.xp:script-api:${xpVersion}"
+    compileOnly xplibs.api.script
 
     implementation "com.cronutils:cron-utils:9.2.1"
     includeLib "com.cronutils:cron-utils:9.2.1"
 
-    testImplementation "com.enonic.xp:testing:${xpVersion}"
+    testImplementation( "com.enonic.xp:testing:${xpVersion}" ) {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
     testImplementation(platform("org.junit:junit-bom:5.13.4"))
     testImplementation(platform("org.mockito:mockito-bom:5.23.0"))
     testImplementation 'org.junit.jupiter:junit-jupiter'
