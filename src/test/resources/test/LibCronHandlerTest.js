@@ -78,6 +78,7 @@ var expectedWithContextJson = {
             user: {
                 type: 'user',
                 key: 'user:system:test-user',
+                displayName: 'test-user',
                 disabled: false,
                 email: 'test-user@example.no',
                 login: 'test-user',
