@@ -19,20 +19,20 @@ configurations {
 dependencies {
     compileOnly xplibs.api.script
 
-    implementation "com.cronutils:cron-utils:9.2.1"
-    includeLib "com.cronutils:cron-utils:9.2.1"
+    implementation libs.cron.utils
+    includeLib libs.cron.utils
 
     testImplementation( "com.enonic.xp:testing:${xpVersion}" ) {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
-    testImplementation(platform("org.junit:junit-bom:6.0.3"))
-    testImplementation(platform("org.mockito:mockito-bom:5.23.0"))
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
-    testImplementation 'org.slf4j:slf4j-log4j12:2.0.17'
-    testImplementation 'org.apache.felix:org.apache.felix.framework:7.0.5'
-    testImplementation 'org.ops4j.pax.tinybundles:tinybundles:4.0.1'
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(platform(libs.mockito.bom))
+    testImplementation libs.junit.jupiter
+    testRuntimeOnly libs.junit.platform.launcher
+    testImplementation libs.mockito.junit.jupiter
+    testImplementation libs.slf4j.log4j12
+    testImplementation libs.felix.framework
+    testImplementation libs.tinybundles
 }
 
 tasks.register('copyLibFiles', Copy) {
