@@ -1,0 +1,18 @@
+[versions]
+cron-utils = "9.2.1"
+felix-framework = "7.0.5"
+junit = "6.0.3"
+mockito = "5.23.0"
+slf4j = "2.0.17"
+tinybundles = "4.0.1"
+
+[libraries]
+cron-utils = { module = "com.cronutils:cron-utils", version.ref = "cron-utils" }
+felix-framework = { module = "org.apache.felix:org.apache.felix.framework", version.ref = "felix-framework" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+mockito-bom = { module = "org.mockito:mockito-bom", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter" }
+slf4j-log4j12 = { module = "org.slf4j:slf4j-log4j12", version.ref = "slf4j" }
+tinybundles = { module = "org.ops4j.pax.tinybundles:tinybundles", version.ref = "tinybundles" }
