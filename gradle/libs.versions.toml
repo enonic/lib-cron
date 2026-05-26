@@ -1,7 +1,7 @@
 [versions]
 cron-utils = "9.2.1"
 felix-framework = "7.0.5"
-junit = "6.0.3"
+junit = "6.1.0"
 mockito = "5.23.0"
 slf4j = "2.0.18"
 tinybundles = "4.0.1"
