@@ -1,0 +1,32 @@
+{
+  "name": "@enonic-types/lib-cron",
+  "version": "0.0.0",
+  "description": "Type definitions for the Enonic XP Cron library",
+  "types": "index.d.ts",
+  "files": [
+    "*"
+  ],
+  "keywords": [
+    "enonic",
+    "enonic-xp",
+    "lib-cron",
+    "cron",
+    "types",
+    "typescript"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/enonic/lib-cron#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enonic/lib-cron.git"
+  },
+  "bugs": {
+    "url": "https://github.com/enonic/lib-cron/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@enonic-types/core": "^8.0.0"
+  }
+}
