@@ -1,6 +1,10 @@
 = Cron library
+:toc: right
 
-image::https://img.shields.io/badge/xp-7.0.0+-blue.svg[role="right"]
+== Introduction
+
+NOTE: Versions 2.x target XP 8+.
+
 To start using this library, add the following into your `build.gradle` file:
 
 [source,groovy]
@@ -47,7 +51,6 @@ The schedule function takes a parameter object with options.
 *** `*user*` (_object_) User credentials.
 **** `*login*` (_string_) User login.
 **** `*idProvider*` (_string_) Id provider containing the user.
-**** `*userStore*` (_string_) Deprecated. Use idProvider instead.
 
 === `Unschedule`
 
@@ -133,7 +136,7 @@ cron.schedule({
         principals: ['role:system.admin'],<3>
         user: {
             login: 'su',
-            userStore: 'system'
+            idProvider: 'system'
         }
     }
 });
