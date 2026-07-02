@@ -441,6 +441,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#introduction">Introduction</a></li>
 <li><a href="#usage">Usage</a>
 <ul class="sectlevel2">
 <li><a href="#schedule"><code>Schedule</code></a></li>
@@ -460,12 +461,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="introduction"><a class="link" href="#introduction">Introduction</a></h2>
 <div class="sectionbody">
-<div class="imageblock right">
-<div class="content">
-<img src="https://img.shields.io/badge/xp-7.0.0+-blue.svg" alt="xp 7.0.0+ blue">
-</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Versions 2.x target XP 8+.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>To start using this library, add the following into your <code>build.gradle</code> file:</p>
@@ -555,9 +564,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li>
 <p><code><strong>idProvider</strong></code> (<em>string</em>) Id provider containing the user.</p>
-</li>
-<li>
-<p><code><strong>userStore</strong></code> (<em>string</em>) Deprecated. Use idProvider instead.</p>
 </li>
 </ul>
 </div>
@@ -720,7 +726,7 @@ cron.schedule({
         principals: ['role:system.admin'],<i class="conum" data-value="3"></i><b>(3)</b>
         user: {
             login: 'su',
-            userStore: 'system'
+            idProvider: 'system'
         }
     }
 });</code></pre>
@@ -840,7 +846,7 @@ task == { "name": "myTask",
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-02 06:45:56 UTC
+Last updated 2026-07-02 06:46:33 UTC
 </div>
 </div>
 </body>
