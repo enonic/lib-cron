@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import com.enonic.lib.cron.scheduler.JobExecutorService;
+import com.enonic.lib.cron.scheduler.JobScheduler;
 import com.enonic.xp.branch.Branch;
 import com.enonic.xp.context.Context;
 import com.enonic.xp.context.ContextBuilder;
@@ -45,7 +46,7 @@ public class LibCronHandlerTest
 
         when( jobExecutorService.scheduleWithFixedDelay( any(), anyLong(), anyLong(), any() ) ).thenReturn( mock() );
         when( jobExecutorService.schedule( any(), anyLong(), any() ) ).thenReturn( mock() );
-        addService( JobExecutorService.class, jobExecutorService );
+        addService( JobScheduler.class, new JobScheduler( jobExecutorService ) );
 
         this.defaultContext = ContextBuilder.create()
             .branch( Branch.from( "draft" ) )
