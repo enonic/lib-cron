@@ -33,6 +33,9 @@ dependencies {
     testImplementation libs.slf4j.log4j12
     testImplementation libs.felix.framework
     testImplementation libs.tinybundles
+
+    // the GraalJS language implementation: com.enonic.xp:testing carries only the polyglot API
+    testRuntimeOnly libs.graalvm.js
 }
 
 tasks.register('copyLibFiles', Copy) {
@@ -62,3 +65,18 @@ check.dependsOn jacocoTestReport
 test {
     useJUnitPlatform()
 }
+
+// This library is required by applications running on either script engine, so its tests have to
+// pass on both. Delete this once com.enonic.xp.base registers the engine tasks itself
+// (enonic/xp-gradle-plugin#222).
+def testGraalJs = tasks.register('testGraalJs', Test) {
+    group = 'verification'
+    description = 'Runs the tests with the GraalJS script engine.'
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty 'xp.script-engine', 'GraalJS'
+    shouldRunAfter test
+}
+
+check.dependsOn testGraalJs
