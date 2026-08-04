@@ -67,16 +67,7 @@ test {
 }
 
 // This library is required by applications running on either script engine, so its tests have to
-// pass on both. Delete this once com.enonic.xp.base registers the engine tasks itself
-// (enonic/xp-gradle-plugin#222).
-def testGraalJs = tasks.register('testGraalJs', Test) {
-    group = 'verification'
-    description = 'Runs the tests with the GraalJS script engine.'
-    useJUnitPlatform()
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
-    systemProperty 'xp.script-engine', 'GraalJS'
-    shouldRunAfter test
+// pass on both. com.enonic.xp.base 4.2.0 registers the GraalJS task from this list.
+xp {
+    scriptEngines = ['Nashorn', 'GraalJS']
 }
-
-check.dependsOn testGraalJs
