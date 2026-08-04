@@ -10,11 +10,21 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.enonic.lib.cron.model.JobDescriptor;
 
+/**
+ * The application's single name-keyed job registry. Registered as a bundle-scoped component so
+ * every {@code LibCronHandler} bean — one per script context — shares the same registry: a job
+ * scheduled through one context can be listed, replaced and unscheduled through any other.
+ */
+@Component(service = JobScheduler.class)
 public final class JobScheduler
 {
     private static final Logger LOG = LoggerFactory.getLogger( JobScheduler.class );
@@ -23,13 +33,16 @@ public final class JobScheduler
 
     private final Map<String, RecurringJob> tasks = new LinkedHashMap<>();
 
-    public JobScheduler( final JobExecutorService executorService )
+    @Activate
+    public JobScheduler( @Reference final JobExecutorService executorService )
     {
         this.jobExecutorService = executorService;
     }
 
+    @Deactivate
     public synchronized void deactivate()
     {
+        this.tasks.values().forEach( RecurringJob::cancel );
         this.tasks.clear();
     }
 

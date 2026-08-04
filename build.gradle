@@ -62,3 +62,9 @@ check.dependsOn jacocoTestReport
 test {
     useJUnitPlatform()
 }
+
+// This library is required by applications running on either script engine, so its tests have to
+// pass on both. com.enonic.xp.base 4.2.0 registers the GraalJS task from this list.
+xp {
+    scriptEngines = ['Nashorn', 'GraalJS']
+}
