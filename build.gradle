@@ -33,9 +33,6 @@ dependencies {
     testImplementation libs.slf4j.log4j12
     testImplementation libs.felix.framework
     testImplementation libs.tinybundles
-
-    // the GraalJS language implementation: com.enonic.xp:testing carries only the polyglot API
-    testRuntimeOnly libs.graalvm.js
 }
 
 tasks.register('copyLibFiles', Copy) {
