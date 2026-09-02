@@ -38,12 +38,36 @@ or
 $ git clone https://github.com/enonic/lib-cron.git && cd lib-cron
 ----
 
-== Buildling
+== Building
 
 [source]
 ----
 $ ./gradlew clean build
 ----
+
+The build bundles `src/main/resources/lib/cron.ts` with esbuild into `build/esbuild`, which Gradle
+folds into the jar as `lib/cron.js`, then runs the Java tests on both script engines.
+
+== Development
+
+TypeScript is type-checked with `tsc` and bundled by esbuild. Gradle drives both through pnpm, so
+`./gradlew build` covers everything below; these are for working on the JavaScript alone.
+
+[source]
+----
+$ pnpm build   # dev esbuild bundle only -> build/esbuild
+$ pnpm check   # type-check (tsc) + lint/format (biome)
+$ pnpm fix     # auto-fix lint + formatting
+----
+
+The emitted JS runs under the consuming app's script engine, and XP 8 still defaults to Nashorn
+15.7 (`--language=es6`): ES5.1 plus a partial ES2015 subset. esbuild targets ES5 and keeps only
+`let`/`const` native; arrows are lowered because Nashorn gets `this` wrong inside them, and
+`for...of` because it loses the loop binding in closures. `tsconfig.json` pins `lib` to `ES5` so
+ES2015+ built-ins are not even typed. `LibCronHandlerTest` then loads the emitted bundle through
+XP's `ScriptTestSupport` on Nashorn and again on GraalJS.
+
+The bundle must keep emitting to `lib/cron.js` — consumers on 2.x call `require('/lib/cron')`.
 
 == Publishing
 
