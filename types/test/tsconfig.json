@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "skipLibCheck": false,
+        "paths": {
+            "/lib/cron": ["../../build/types"]
+        }
+    },
+    "include": ["consumer.ts"]
+}
