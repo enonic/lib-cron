@@ -23,7 +23,26 @@ The bundle ships as `lib/cron.js` and that path is fixed — 2.x consumers call 
 pnpm build                  # dev esbuild bundle only -> build/esbuild
 pnpm check                  # type-check (tsc) + lint/format (biome)
 pnpm fix                    # auto-fix lint + formatting
+pnpm build:types            # @enonic-types/lib-cron package -> build/types (version from gradle.properties)
+pnpm test:types             # build:types + verify:types, the one-command developer entry point
+pnpm verify:types           # packlist check + type-check types/test against an existing build/types
 ```
+
+`./gradlew build` runs `buildTypes` (into `assemble`) and `testTypes` (into `check`); CI publishes
+`build/types` to npm right after the Maven publish on release versions only.
+
+`testTypes` runs `verify:types`, not `test:types`, because `types/build.mjs` opens with
+`rm -rf build/types` — running the full `test:types` there would have a verification task delete
+and rewrite `buildTypes`' declared output. lib-cors still has that wiring; this repo deliberately
+diverges.
+
+The types package is generated, never hand-written. `tsconfig.types.json` emits declarations from
+`cron.ts`, and `types/build.mjs` assembles `build/types` with the version from `gradle.properties`.
+A type reaches the package only if it is `export`ed, and the `declare global { interface
+XpLibraries }` block in `cron.ts` is what types `require('/lib/cron')` for consumers — esbuild
+erases it from the bundle. `types/verify.mjs` checks the built package rather than the emitted
+file: the npm packlist, an import-style consumer (`types/test/consumer.ts`) and a `require()`-only
+one (`types/test/require-only.ts`), both with `skipLibCheck: false`.
 
 `xp.scriptEngines` gives `check` a `test` task on Nashorn and a `testGraalJS` task on GraalJS.
 `LibCronHandlerTest` drives the emitted bundle through `ScriptTestSupport`, so both engines execute

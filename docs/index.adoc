@@ -23,6 +23,31 @@ To use this library in your JavaScript code, it first needs to be required:
 var cronLib = require('/lib/cron');
 ----
 
+=== TypeScript
+
+Type declarations are published as `@enonic-types/lib-cron`, generated from the library source so
+the version matches the jar:
+
+[source,bash]
+----
+npm install --save-dev @enonic-types/lib-cron
+----
+
+Add it to both `types` and `paths` in `tsconfig.json` — the `types` entry is what types
+`require('/lib/cron')`, the `paths` entry is what resolves `import ... from '/lib/cron'`:
+
+[source,json]
+----
+{
+  "compilerOptions": {
+    "types": ["@enonic-types/global", "@enonic-types/lib-cron"],
+    "paths": {
+      "/lib/cron": ["./node_modules/@enonic-types/lib-cron"]
+    }
+  }
+}
+----
+
 === `Schedule`
 
 Use the following code to schedule a task:
@@ -39,7 +64,7 @@ The schedule function takes a parameter object with options.
 * `options` (_object_) Parameters to schedule a task.
 ** `*name*` (_string_) Unique task name.
 ** `*cron*` (_string_) Cron-pattern (see https://en.wikipedia.org/wiki/Cron[UINX cron pattern]). Can't be set with (`*fixedDelay*`/`*delay*`).
-** `*fixedDelay*` (_number_) The delay between the termination of one execution and the commencement of the next. Can't be set with (`*cron*`).
+** `*fixedDelay*` (_number_) The delay between the termination of one execution and the commencement of the next. Required, and bigger than `0`, when `*cron*` is not set. Can't be set with (`*cron*`).
 ** `*delay*` (_number_) The time to delay first execution. Can't be set with (`*cron*`).
 ** `*times*` (_number_) The number of times the task will be executed. Leave it empty for infinite calls.
 ** `*callback*` (_function_) Code of task which should be called.
@@ -50,7 +75,7 @@ The schedule function takes a parameter object with options.
 *** `*attributes*` (_object_) Additional Context attributes.
 *** `*user*` (_object_) User credentials.
 **** `*login*` (_string_) User login.
-**** `*idProvider*` (_string_) Id provider containing the user.
+**** `*idProvider*` (_string_) Id provider containing the user. Required when `*user*` is set.
 
 === `Unschedule`
 
@@ -105,16 +130,27 @@ And the result is task mapper object, which contains description of run task:
 ** `*delay*` (_number_) The time to delay first execution.
 ** `*applicationKey*` (_string_) Key of application has run the task.
 ** `*context*` (_object_) Contains information about task context(repo, branch, authInfo).
-** `*nextExecTime*` (_string_) Provides nearest time for next execution in ISO 8601 format.
+** `*nextExecTime*` (_string_) Provides nearest time for next execution in ISO 8601 format. Cron tasks only.
 
 To fetch a list of all scheduled tasks use `list` method:
 
 [source,js]
 ----
-var taskArray = cronLib.list();
+var result = cronLib.list();
 ----
 
-Result is an array of task mapper objects, described above.
+*Parameters*
+
+The list function optionally takes a parameter object with a name filter:
+
+* `options` (_object_) Parameters to list tasks.
+** `*pattern*` (_string_) Regular expression the task name must match in full. Leave it empty to
+list every task.
+
+*Result*
+
+* `result` (_object_)
+** `*jobs*` (_object[]_) Task mapper objects, described above, in the order they were scheduled.
 
 == Examples
 

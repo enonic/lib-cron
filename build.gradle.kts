@@ -76,6 +76,28 @@ val pnpmBuild = tasks.register<PnpmTask>("pnpmBuild") {
     doFirst { staleOutput.deleteRecursively() }
 }
 
+// @enonic-types/lib-cron, published from build/types by release-tools on release builds
+val typesOutput = layout.buildDirectory.dir("types")
+
+val buildTypes = tasks.register<PnpmTask>("buildTypes") {
+    dependsOn(tasks.named("pnpmInstall"))
+    args = listOf("run", "build:types")
+    environment = mapOf("FORCE_COLOR" to "true")
+    inputs.dir("src/main/resources")
+    inputs.files("types/package.json", "types/README.md", "types/build.mjs", "LICENSE")
+    inputs.files("gradle.properties", "package.json", "pnpm-lock.yaml", "tsconfig.json", "tsconfig.types.json")
+    outputs.dir(typesOutput)
+    outputs.dir(layout.buildDirectory.dir("types-dts"))
+}
+
+// verify:types, not test:types — the latter regenerates build/types, which is buildTypes' output
+val testTypes = pnpmCheck("testTypes", "verify:types")
+testTypes.configure { dependsOn(buildTypes) }
+
+tasks.named("assemble") {
+    dependsOn(buildTypes)
+}
+
 // cron-utils ships inside the jar, unpacked alongside the library's own classes
 val copyLibFiles = tasks.register<Copy>("copyLibFiles") {
     from(zipTree(includeLib.elements.map { it.single().asFile })) {
@@ -103,7 +125,7 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 }
 
 tasks.named("check") {
-    dependsOn("checkTypes", "checkLint", tasks.named("jacocoTestReport"))
+    dependsOn("checkTypes", "checkLint", testTypes, tasks.named("jacocoTestReport"))
 }
 
 tasks.withType<Test>().configureEach {

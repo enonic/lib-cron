@@ -55,9 +55,11 @@ TypeScript is type-checked with `tsc` and bundled by esbuild. Gradle drives both
 
 [source]
 ----
-$ pnpm build   # dev esbuild bundle only -> build/esbuild
-$ pnpm check   # type-check (tsc) + lint/format (biome)
-$ pnpm fix     # auto-fix lint + formatting
+$ pnpm build        # dev esbuild bundle only -> build/esbuild
+$ pnpm check        # type-check (tsc) + lint/format (biome)
+$ pnpm fix          # auto-fix lint + formatting
+$ pnpm test:types   # build the types package, check its packlist and type-check it as a consumer
+$ pnpm verify:types # the check half alone, against an existing build/types (what Gradle runs)
 ----
 
 The emitted JS runs under the consuming app's script engine, and XP 8 still defaults to Nashorn
@@ -68,6 +70,14 @@ ES2015+ built-ins are not even typed. `LibCronHandlerTest` then loads the emitte
 XP's `ScriptTestSupport` on Nashorn and again on GraalJS.
 
 The bundle must keep emitting to `lib/cron.js` — consumers on 2.x call `require('/lib/cron')`.
+
+The `@enonic-types/lib-cron` package is generated, not written. `tsconfig.types.json` emits
+declarations from `cron.ts` and `types/build.mjs` assembles `build/types`, taking the version from
+`gradle.properties`. A type reaches the package only if it is `export`ed, and the
+`declare global { interface XpLibraries }` block is what types `require('/lib/cron')` for consumers
+(esbuild erases it). `types/verify.mjs` checks the built package rather than the emitted file: the
+npm packlist, an import-style consumer and a `require()`-only one, both with `skipLibCheck: false`.
+On a release build, `release-tools` publishes `build/types` to npm right after the Maven publish.
 
 == Publishing
 
